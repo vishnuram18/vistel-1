@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vistel - Sign Up</title>
+    <link rel="stylesheet" href="signup.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="signup-container">
+        <h1>Sign Up</h1>
+        <div class="form-signup">
+            <ul class="signup-nav">
+                <li class="signup-nav_item">
+                    <a href="signin.html">Sign In</a>
+                </li>
+                <li class="signup-nav_item active">
+                    <a href="#">Sign Up</a>
+                </li>
+            </ul>
+            <label for="signup-input-email" class="signup-label">Email</label>
+            <input id="signup-input-email" class="signup-input" type="email" required />
+            <label for="signup-input-password" class="signup-label">Password</label>
+            <input id="signup-input-password" class="signup-input" type="password" required />
+            <label for="signup-input-confirm-password" class="signup-label">Confirm Password</label>
+            <input id="signup-input-confirm-password" class="signup-input" type="password" required />
+            <button class="signup-submit" type="button" id="submit">SIGN UP</button>
+        </div>
+        <a href="signin.html" class="signup-login">Already have an account? Sign In</a>
+    </div>
+
+    <!-- Firebase and Script for Handling Sign Up -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getDatabase, set, ref } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJKSXv32xRhwfdEZPBl4h5NGKBV6PSBTo",
+            authDomain: "vistel-aa166.firebaseapp.com",
+            databaseURL: "https://vistel-aa166-default-rtdb.firebaseio.com",
+            projectId: "vistel-aa166",
+            storageBucket: "vistel-aa166.appspot.com",
+            messagingSenderId: "866833870372",
+            appId: "1:866833870372:web:968919efd2d0430672b2b1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Handle the Sign-Up Process
+        document.getElementById('submit').addEventListener('click', () => {
+            const email = document.getElementById("signup-input-email").value;
+            const password = document.getElementById("signup-input-password").value;
+            const confirmPassword = document.getElementById("signup-input-confirm-password").value;
+
+            // Validate password confirmation
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            // Create a new user with email and password
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const signupDate = new Date().toISOString();
+
+                    // Save additional user information in the database
+                    set(ref(db, 'User/' + user.uid), {
+                        email: email,
+                        signup_date: signupDate
+                    })
+                    .then(() => {
+                        // After successfully saving user data, redirect to the language selection page
+                        window.location.assign("language-selection.html");
+                    })
+                    .catch((error) => {
+                        alert('Error saving user data: ' + error.message);
+                    });
+                })
+                .catch((error) => {
+                    const errorMessage = error.message;
+                    alert('Sign Up Error: ' + errorMessage);
+                });
+        });
+    </script>
+</body>
+
+</html>

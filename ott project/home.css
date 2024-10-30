@@ -1,0 +1,212 @@
+/* General reset and styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: url('image/vistel.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}
+
+/* Header styles */
+header {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+    color: #e50914;
+}
+
+/* Genre button styles */
+.genre-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+
+.genre-button:hover {
+    background-color: rgba(0, 0, 0, 1);
+}
+
+/* Genre list styles */
+.genre-list {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Initially hidden */
+    width: 250px;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    overflow-y: auto;
+    transition: left 0.3s ease;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+/* General styles for all genre items */
+.genre-list .genre-item {
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    transition: color 0.3s ease;
+    display: block;
+    padding-left: 15px;
+}
+
+/* Specific color classes */
+.color-popular {
+    color: #ffffff; /* Gold */
+}
+
+.color-trending {
+    color: #fffdfc; /* OrangeRed */
+}
+
+.color-imdb {
+    color: #fbfbfb; /* RoyalBlue */
+}
+
+.color-moco {
+    color: #f0f2f0; /* LimeGreen */
+}
+
+.color-action {
+    color: #DC143C; /* Crimson */
+}
+
+.color-drama {
+    color: #8A2BE2; /* BlueViolet */
+}
+
+.color-comedy {
+    color: #FF6347; /* Tomato */
+}
+
+.color-horror {
+    color: #2F4F4F; /* DarkSlateGray */
+}
+
+.color-sci-fi {
+    color: #00CED1; /* DarkTurquoise */
+}
+
+.color-fantasy {
+    color: #FF69B4; /* HotPink */
+}
+
+.color-romance {
+    color: #FF1493; /* DeepPink */
+}
+
+/* Hover effect */
+.genre-item:hover {
+    opacity: 0.8;
+}
+
+.genre-list .setting-item {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s ease;
+}
+    
+
+/* Hover effect */
+.genre-item:hover {
+    opacity: 0.8;
+}
+
+.genre-list .genre-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Hero section styles */
+.hero {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.hero h1 {
+    font-size: 60px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+.hero p {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.hero .btn {
+    padding: 15px 30px;
+    margin-right: 15px;
+    background-color: #e50914;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.hero .btn:hover {
+    background-color: #f6121d;
+}
+
+/* Footer styles */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+.genre-item {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Color styles for each genre */

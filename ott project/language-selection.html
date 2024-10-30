@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Selection</title>
+    <link rel="stylesheet" href="language.css">
+</head>
+
+<body>
+    <div class="language-container">
+        <h1>Select Your Preferred Language</h1>
+        <div class="languages">
+            <button class="language-btn" data-language="English">English</button>
+            <button class="language-btn" data-language="Tamil">Tamil</button>
+            <button class="language-btn" data-language="Hindi">Hindi</button>
+            <button class="language-btn" data-language="Telugu">Telugu</button>
+            <button class="language-btn" data-language="Kannada">Kannada</button>
+            <button class="language-btn" data-language="Malayalam">Malayalam</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJKSXv32xRhwfdEZPBl4h5NGKBV6PSBTo",
+            authDomain: "vistel-aa166.firebaseapp.com",
+            databaseURL: "https://vistel-aa166-default-rtdb.firebaseio.com",
+            projectId: "vistel-aa166",
+            storageBucket: "vistel-aa166.appspot.com",
+            messagingSenderId: "866833870372",
+            appId: "1:866833870372:web:968919efd2d0430672b2b1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Handle language selection
+        document.querySelectorAll('.language-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const selectedLanguage = button.getAttribute('data-language');
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // Save selected language in the database
+                        update(ref(db, 'User/' + user.uid), {
+                            language: selectedLanguage
+                        })
+                        .then(() => {
+                            alert('Language selected: ' + selectedLanguage);
+                            window.location.assign("home.html"); // Redirect to homepage
+                        })
+                        .catch((error) => {
+                            alert('Error saving language: ' + error.message);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

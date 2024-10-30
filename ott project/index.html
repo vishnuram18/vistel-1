@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vistel</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="motioncomics.html">Motion Comics</a></li>
+                <li><a href="subscription.html">Subscription</a></li>
+                <li><a href="profile.html">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <button id="genre-button" class="genre-button">
+        <i class="fas fa-list"></i> <!-- Font Awesome icon -->
+    </button>
+
+    <div id="genre-list" class="genre-list">
+        <br><br><br>
+        <a href="genre-most-popular.html" class="genre-item color-popular">Most popular</a>
+        <a href="genre-trending.html" class="genre-item color-trending">Trending</a>
+        <a href="genre-IMDB.html" class="genre-item color-imdb">IMDB</a>
+        <a href="genre-Moco-movies.html" class="genre-item color-moco">Moco movies</a>
+        <br><br>
+        <a class="genre-item">GENRE</a>
+        <a href="genre-action.html" class="genre-item color-action">Action</a>
+        <a href="genre-drama.html" class="genre-item color-drama">Drama</a>
+        <a href="genre-comedy.html" class="genre-item color-comedy">Comedy</a>
+        <a href="genre-horror.html" class="genre-item color-horror">Horror</a>
+        <a href="genre-sci-fi.html" class="genre-item color-sci-fi">Sci-Fi</a>
+        <a href="genre-fantasy.html" class="genre-item color-fantasy">Fantasy</a>
+        <a href="genre-romance.html" class="genre-item color-romance">Romance</a>
+    </div>
+    
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Vistel</h1>
+            <p>Your favorite motion comics in one place.</p>
+            <a href="subscription.html" class="btn">Subscribe Now</a>
+            <a href="signin.html" class="btn">Login</a>
+        </div>
+    </section>
+
+    <script type="module">
+        // Firebase Initialization
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJKSXv32xRhwfdEZPBl4h5NGKBV6PSBTo",
+            authDomain: "vistel-aa166.firebaseapp.com",
+            databaseURL: "https://vistel-aa166-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vistel-aa166",
+            storageBucket: "vistel-aa166.appspot.com",
+            messagingSenderId: "866833870372",
+            appId: "1:866833870372:web:968919efd2d0430672b2b1",
+            measurementId: "G-SR4078H6SP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+
+    <footer>
+        <p>&copy; 2024 OTT Platform. All rights reserved.</p>
+    </footer>
+
+    <!-- Include the script for genre button functionality -->
+    <script>
+        document.getElementById('genre-button').addEventListener('click', () => {
+            const genreList = document.getElementById('genre-list');
+            const isVisible = genreList.style.left === '0px';
+            genreList.style.left = isVisible ? '-250px' : '0px';
+        });
+    </script>
+</body>
+
+</html>
