@@ -15,7 +15,7 @@ document.getElementById('playPauseButton').addEventListener('click', function() 
     const videoPlayer = document.getElementById('videoPlayer');
     if (videoPlayer.paused) {
         videoPlayer.play();
-        this.textContent = 'Pause';
+        this.textContent = 'Pause';//SHEHAETHETH
     } else {
         videoPlayer.pause();
         this.textContent = 'Play';
