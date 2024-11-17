@@ -5,136 +5,176 @@
     box-sizing: border-box;
 }
 
+/* Root Variables for Colors */
+:root {
+    --netflix-dark: #141414;
+    --netflix-red: #e50914;
+    --hover-red: #b81d24;
+    --text-white: #ffffff;
+    --light-gray: #e5e5e5;
+    --medium-gray: #444;
+    --accent-bg: rgba(34, 34, 34, 0.7);
+    --card-bg: rgba(51, 51, 51, 0.8);
+    --blur-effect: blur(10px);
+}
+
 /* Body Styling */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #141414;
-    color: #fff;
-}
-
-/* Subscription Page Specific Styling */
-.subscription-wrapper {
-    max-width: 800px;
-    margin: 20px auto;
+    background-color: var(--netflix-dark);
+    color: var(--text-white);
     padding: 20px;
-    background-color: rgba(34, 34, 34, 0.7);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    line-height: 1.6;
 }
 
-.subscription-wrapper h2 {
-    margin-bottom: 20px;
-    color: #e50914;
-    text-align: center;
-}
-
-.subscription-plans {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-}
-
-.subscription-plan {
-    background-color: rgba(51, 51, 51, 0.7);
-    padding: 20px;
-    border-radius: 10px;
-    margin: 10px;
-    text-align: center;
-    flex: 1;
-    min-width: 200px;
-    max-width: 250px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s;
-    backdrop-filter: blur(10px);
-}
-
-.subscription-plan:hover {
-    transform: scale(1.05);
-}
-
-.subscription-plan h3 {
-    margin-bottom: 10px;
-    color: #fff;
-}
-
-.subscription-plan p {
-    margin-bottom: 15px;
-    color: #ccc;
-}
-
-.subscription-plan .price {
-    font-size: 24px;
-    margin-bottom: 15px;
-    color: #e50914;
-}
-
-.subscription-plan button {
-    background-color: #e50914;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.subscription-plan button:hover {
-    background-color: #b81d24;
-}
-
-/* General resets */
-body, ul, li, a {
-    margin: 0;
-    padding: 0;
-    text-decoration: none;
-    list-style: none;
-    box-sizing: border-box;
-}
-
-/* Body styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #141414; /* Netflix dark background */
-    color: #fff;
-}
-
-/* Navigation styles */
+/* Navigation Styles */
 nav {
-    background-color: #141414;
-    padding: 20px 0;
+    background-color: var(--netflix-dark);
+    padding: 15px 0;
     text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 nav ul {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-nav li {
-    margin: 0 15px;
+    gap: 20px;
 }
 
 nav a {
-    color: #e5e5e5; /* Light grey for non-active links */
+    color: var(--light-gray);
     font-size: 18px;
-    transition: color 0.3s;
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
 nav a:hover,
 nav a.active {
-    color: #e50914; /* Netflix red for hover and active links */
+    color: var(--netflix-red);
+    font-weight: bold;
+    transform: scale(1.1);
+}
+
+/* Subscription Page Specific Styling */
+.subscription-wrapper {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--accent-bg);
+    border-radius: 15px;
+    backdrop-filter: var(--blur-effect);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.subscription-wrapper h2 {
+    margin-bottom: 30px;
+    color: var(--netflix-red);
+    font-size: 28px;
+    text-transform: uppercase;
+}
+
+/* Subscription Plans Styling */
+.subscription-plans {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.subscription-plan {
+    background-color: var(--card-bg);
+    padding: 25px;
+    border-radius: 12px;
+    margin: 10px;
+    text-align: center;
+    flex: 1;
+    min-width: 220px;
+    max-width: 260px;
+    transition: transform 0.4s ease, box-shadow 0.3s ease;
+    backdrop-filter: var(--blur-effect);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.subscription-plan:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.subscription-plan h3 {
+    margin-bottom: 15px;
+    font-size: 22px;
+    color: var(--text-white);
+    text-transform: uppercase;
+}
+
+.subscription-plan p {
+    margin-bottom: 15px;
+    color: #ccc;
+    font-size: 16px;
+}
+
+.subscription-plan .price {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: var(--netflix-red);
     font-weight: bold;
 }
 
-/* Responsive design for smaller screens */
-@media (max-width: 600px) {
-    nav ul {
+/* Button Styling */
+.subscription-plan button {
+    background-color: var(--netflix-red);
+    color: var(--text-white);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.subscription-plan button:hover {
+    background-color: var(--hover-red);
+    transform: scale(1.05);
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    .subscription-plans {
         flex-direction: column;
+        align-items: center;
     }
 
-    nav li {
-        margin: 10px 0;
+    .subscription-plan {
+        max-width: 90%;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-wrapper {
+        padding: 20px;
+    }
+
+    nav a {
+        font-size: 16px;
+    }
+
+    .subscription-plan h3 {
+        font-size: 20px;
+    }
+
+    .subscription-plan .price {
+        font-size: 22px;
+    }
+
+    .subscription-plan button {
+        padding: 10px 20px;
     }
 }

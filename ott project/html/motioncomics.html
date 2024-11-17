@@ -4,42 +4,46 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTT - motiomcomics</title>
+    <title>OTT - MotionComics</title>
     <link rel="stylesheet" href="../css/motiomcomics.css">
 </head>
 <body>
     <nav>
         <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="motioncomics.html">motiomcomics</a></li>
+            <li><a href="motioncomics.html">MotionComics</a></li>
             <li><a href="subscription.html">Subscription</a></li>
             <li><a class="active" href="profile.html">Profile</a></li>
         </ul>
     </nav>
+
     <div class="content-wrapper">
-        <h2 class="section-title">Voicebooks Collection</h2>
+        <h2 class="section-title">MotionComics Collection</h2>
         <div class="item-list">
-            <div class="item" data-audio="audio1.mp3">
-                <img src="../image/haunting adeline.jpg" alt="Voicebook 1">
-                <h3>Voicebook Title 1</h3>
+            <!-- Motioncomic 1 -->
+            <div class="item" data-video="motioncomic1.mp4">
+                <img src="../image/haunting adeline.jpg" alt="Motioncomic 1">
+                <h3>Motioncomic Title 1</h3>
                 <p>Author: H. D. Carlton</p>
             </div>
-            <div class="item" data-audio="audio2.mp3">
-                <img src="../image/pexels-artem-saranin-1496373.jpg" alt="Voicebook 2">
-                <h3>The Art of being alone</h3>
+            <!-- Motioncomic 2 -->
+            <div class="item" data-video="motioncomic2.mp4">
+                <img src="../image/pexels-artem-saranin-1496373.jpg" alt="Motioncomic 2">
+                <h3>The Art of Being Alone</h3>
                 <p>Author: Renuka Gavrani</p>
             </div>
         </div>
     </div>
 
-    <div id="audioPlayerContainer" class="audio-player-container">
-        <audio id="audioPlayer" controls>
-            <source id="audioSource" src="" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
+    <!-- Video Player Container -->
+    <div id="videoPlayerContainer" class="video-player-container">
+        <video id="videoPlayer" controls>
+            <source id="videoSource" src="" type="video/mp4">
+            Your browser does not support the video element.
+        </video>
         <button id="playPauseButton">Pause</button>
     </div>
 
-    <script src="voicebooks.js"></script>
+    <script src="../javascript/motioncomics.js"></script>
 </body>
 </html>
