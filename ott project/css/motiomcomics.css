@@ -10,7 +10,7 @@ body, ul, li, a {
 /* Body styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #141414; /* Netflix dark background */
+    background-color: #141414; /* Dark background */
     color: #fff;
 }
 
@@ -39,7 +39,7 @@ nav a {
 
 nav a:hover,
 nav a.active {
-    color: #e50914; /* Netflix red for hover and active links */
+    color: #e50914; /* Red for hover and active links */
     font-weight: bold;
 }
 
@@ -81,34 +81,74 @@ nav a.active {
     background-color: #333;
 }
 
-/* Audio player container styles */
+/* Video player container styles */
 .audio-player-container {
-    display: none;
+    display: none; /* Initially hidden */
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     margin-top: 20px;
+    background-color: rgba(0, 0, 0, 0.7); /* Slightly dark background */
+    border-radius: 10px;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    position: fixed;
+    bottom: -100%; /* Start from below */
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 0.5s ease-out; /* Smooth transition for pop-up effect */
 }
 
-#audioPlayer {
-    margin-right: 10px;
+/* Class to show the video player */
+.audio-player-container.show {
+    bottom: 20px; /* Move to the desired position */
 }
 
-/* Play/pause button styles */
+/* Video player */
+#videoPlayer {
+    width: 100%;
+    height: 450px;
+    border-radius: 10px;
+    background-color: #000;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Play/Pause button styles */
 #playPauseButton {
     background-color: #e50914; /* Netflix red */
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 25px;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    margin-top: 15px;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%;
+    max-width: 150px;
 }
 
 #playPauseButton:hover {
-    background-color: #bf0c0c;
+    background-color: #b81d24;
+    transform: scale(1.05);
 }
 
-/* Responsive design for smaller screens */
+/* Hide default controls */
+#videoPlayer::-webkit-media-controls {
+    display: none;
+}
+
+#videoPlayer::-moz-media-controls {
+    display: none;
+}
+
+#videoPlayer::-ms-media-controls {
+    display: none;
+}
+
+/* Responsive Design */
 @media (max-width: 600px) {
     nav ul {
         flex-direction: column;
@@ -129,10 +169,15 @@ nav a.active {
     }
 
     .audio-player-container {
-        flex-direction: column;
+        width: 95%;
+        padding: 10px;
     }
 
-    #audioPlayer {
-        margin-bottom: 10px;
+    #videoPlayer {
+        height: 300px;
+    }
+
+    #playPauseButton {
+        width: 100%;
     }
 }

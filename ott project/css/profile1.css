@@ -5,28 +5,76 @@
     box-sizing: border-box;
 }
 
-/* Body Styling */
+/* Root Variables for Modern Colors */
+:root {
+    --netflix-dark: #141414;
+    --netflix-red: #e50914;
+    --hover-red: #bf0c0c;
+    --text-white: #ffffff;
+    --light-gray: #e5e5e5;
+    --dark-gray: #222;
+    --medium-gray: #444;
+    --progress-bg: #555;
+    --accent-color: #00b4d8;
+}
+
+/* Body Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #141414;
-    color: #fff;
+    background-color: var(--netflix-dark);
+    color: var(--text-white);
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Navigation Styles */
+nav {
+    background-color: var(--netflix-dark);
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+nav a {
+    color: var(--light-gray);
+    font-size: 18px;
+    font-weight: 500;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+nav a:hover,
+nav a.active {
+    color: var(--netflix-red);
+    font-weight: bold;
+    transform: scale(1.1);
 }
 
 /* Profile Page Specific Styling */
 .profile-wrapper {
     max-width: 1000px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: rgba(34, 34, 34, 0.7);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin: 40px auto;
+    padding: 30px;
+    background-color: rgba(34, 34, 34, 0.8);
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
+/* Profile Header */
 .profile-header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid var(--medium-gray);
     padding-bottom: 20px;
     margin-bottom: 20px;
 }
@@ -37,39 +85,55 @@ body {
 }
 
 .profile-image img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    border: 2px solid #e50914;
+    border: 3px solid var(--netflix-red);
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.profile-image img:hover {
+    transform: scale(1.1);
 }
 
 .profile-info h2 {
     margin-bottom: 10px;
-    color: #e50914;
+    color: var(--netflix-red);
+    font-size: 26px;
 }
 
 .profile-info p {
     margin-bottom: 5px;
+    color: var(--light-gray);
 }
 
+/* Social Links */
 .social-links {
     list-style: none;
     display: flex;
-    gap: 10px;
+    gap: 15px;
 }
 
 .social-links li i {
-    font-size: 20px;
-    color: #e50914;
+    font-size: 24px;
+    color: var(--netflix-red);
+    transition: color 0.3s ease;
 }
 
+.social-links li i:hover {
+    color: var(--hover-red);
+}
+
+/* Progress Section */
 .progress-section {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .progress-section h2 {
-    margin-bottom: 10px;
-    color: #e50914;
+    margin-bottom: 15px;
+    color: var(--netflix-red);
+    font-size: 24px;
 }
 
 .progress-list {
@@ -80,19 +144,25 @@ body {
 .progress-item {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-    background-color: rgba(51, 51, 51, 0.7);
-    padding: 10px;
-    border-radius: 5px;
+    margin-bottom: 15px;
+    background-color: rgba(51, 51, 51, 0.8);
+    padding: 15px;
+    border-radius: 10px;
     backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+
+.progress-item:hover {
+    transform: translateY(-5px);
 }
 
 .progress-item img {
-    width: 50px;
-    height: 75px;
+    width: 60px;
+    height: 90px;
     object-fit: cover;
-    border-radius: 5px;
-    margin-right: 10px;
+    border-radius: 8px;
+    margin-right: 15px;
 }
 
 .progress-details {
@@ -109,68 +179,64 @@ body {
 }
 
 .progress-bar {
-    background-color: #555;
+    background-color: var(--progress-bg);
     border-radius: 5px;
     overflow: hidden;
-    height: 8px;
+    height: 10px;
 }
 
 .progress-bar .progress {
-    background-color: #e50914;
+    background-color: var(--netflix-red);
     height: 100%;
-}
-/* General resets */
-body, ul, li, a {
-    margin: 0;
-    padding: 0;
-    text-decoration: none;
-    list-style: none;
-    box-sizing: border-box;
+    transition: width 0.4s ease;
 }
 
-/* Body styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #141414; /* Netflix dark background */
-    color: #fff;
-}
-
-/* Navigation styles */
-nav {
-    background-color: #141414;
-    padding: 20px 0;
-    text-align: center;
-}
-
-nav ul {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-nav li {
-    margin: 0 15px;
-}
-
-nav a {
-    color: #e5e5e5; /* Light grey for non-active links */
-    font-size: 18px;
-    transition: color 0.3s;
-}
-
-nav a:hover,
-nav a.active {
-    color: #e50914; /* Netflix red for hover and active links */
-    font-weight: bold;
-}
-
-/* Responsive design for smaller screens */
-@media (max-width: 600px) {
-    nav ul {
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    .profile-header {
         flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
 
-    nav li {
-        margin: 10px 0;
+    .profile-image {
+        margin-bottom: 15px;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .social-links {
+        justify-content: center;
+    }
+
+    .progress-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .progress-item img {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-wrapper {
+        padding: 20px;
+    }
+
+    .profile-info h2 {
+        font-size: 22px;
+    }
+
+    .progress-section h2 {
+        font-size: 20px;
+    }
+
+    nav a {
+        font-size: 16px;
     }
 }
