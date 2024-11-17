@@ -9,16 +9,17 @@ body, ul, li, a {
 
 /* Body styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #141414; /* Dark background */
+    font-family: 'Roboto', sans-serif;
+    background-color: #141414; /* Dark background for a sleek OTT look */
     color: #fff;
 }
 
 /* Navigation styles */
 nav {
     background-color: #141414;
-    padding: 20px 0;
+    padding: 15px 0;
     text-align: center;
+    border-bottom: 1px solid #333;
 }
 
 nav ul {
@@ -28,156 +29,170 @@ nav ul {
 }
 
 nav li {
-    margin: 0 15px;
+    margin: 0 20px;
 }
 
 nav a {
-    color: #e5e5e5; /* Light grey for non-active links */
+    color: #e5e5e5;
     font-size: 18px;
-    transition: color 0.3s;
+    transition: color 0.3s ease-in-out;
 }
 
 nav a:hover,
 nav a.active {
-    color: #e50914; /* Red for hover and active links */
+    color: #e50914; /* Netflix red for hover and active links */
     font-weight: bold;
 }
 
 /* Content wrapper styles */
 .content-wrapper {
-    padding: 20px;
+    padding: 40px 20px;
     text-align: center;
 }
 
 .section-title {
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-bottom: 30px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #f5f5f5;
 }
 
 .item-list {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    gap: 20px;
 }
 
 .item {
     background-color: #222;
-    padding: 20px;
+    padding: 15px;
     margin: 10px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    width: 200px;
+    border-radius: 10px;
+    transition: transform 0.3s, background-color 0.3s;
+    width: 220px;
     text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .item img {
     width: 100%;
     height: auto;
-    border-radius: 5px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.item h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #f5f5f5;
+}
+
+.item p {
+    font-size: 16px;
+    color: #aaa;
 }
 
 .item:hover {
     background-color: #333;
+    transform: translateY(-5px);
 }
 
-/* Video player container styles */
-.audio-player-container {
-    display: none; /* Initially hidden */
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin-top: 20px;
-    background-color: rgba(0, 0, 0, 0.7); /* Slightly dark background */
-    border-radius: 10px;
-    padding: 20px;
-    width: 80%;
-    max-width: 800px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-    position: fixed;
-    bottom: -100%; /* Start from below */
-    left: 50%;
-    transform: translateX(-50%);
-    transition: bottom 0.5s ease-out; /* Smooth transition for pop-up effect */
-}
-
-/* Class to show the video player */
-.audio-player-container.show {
-    bottom: 20px; /* Move to the desired position */
-}
-
-/* Video player */
-#videoPlayer {
-    width: 100%;
-    height: 450px;
-    border-radius: 10px;
-    background-color: #000;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-}
-
-/* Play/Pause button styles */
-#playPauseButton {
-    background-color: #e50914; /* Netflix red */
-    color: #fff;
-    border: none;
-    padding: 12px 25px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 16px;
-    transition: background-color 0.3s, transform 0.3s;
-    width: 100%;
-    max-width: 150px;
-}
-
-#playPauseButton:hover {
-    background-color: #b81d24;
+.item img:hover {
     transform: scale(1.05);
 }
 
-/* Hide default controls */
-#videoPlayer::-webkit-media-controls {
-    display: none;
+/* Video player container styles */
+.video-player-container {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: -100%; /* Start hidden below the screen */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    width: 80%;
+    max-width: 900px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    transition: bottom 0.5s ease-out;
+    z-index: 1000;
 }
 
-#videoPlayer::-moz-media-controls {
-    display: none;
+.video-player-container.show {
+    display: flex;
+    bottom: 20px; /* Pop up from below */
+    justify-content: center;
 }
 
-#videoPlayer::-ms-media-controls {
-    display: none;
+#videoPlayer {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    outline: none;
 }
 
-/* Responsive Design */
-@media (max-width: 600px) {
+/* Close button for video player */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    color: #e50914;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.close-button:hover {
+    transform: scale(1.2);
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #333;
+    border-radius: 10px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .item-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .video-player-container {
+        width: 95%;
+        bottom: 15px;
+    }
+}
+
+@media (max-width: 480px) {
     nav ul {
         flex-direction: column;
+        padding: 10px 0;
     }
 
     nav li {
         margin: 10px 0;
     }
 
-    .item-list {
-        flex-direction: column;
-        align-items: center;
-    }
-
     .item {
-        width: 80%;
-        margin: 10px 0;
+        width: 90%;
     }
 
-    .audio-player-container {
-        width: 95%;
-        padding: 10px;
-    }
-
-    #videoPlayer {
-        height: 300px;
-    }
-
-    #playPauseButton {
-        width: 100%;
+    .section-title {
+        font-size: 28px;
     }
 }
