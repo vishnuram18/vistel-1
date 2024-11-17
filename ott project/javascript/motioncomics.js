@@ -4,12 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const videoPlayerContainer = document.getElementById('videoPlayerContainer');
     const videoPlayer = document.getElementById('videoPlayer');
     const videoSource = document.getElementById('videoSource');
-    
-    // Optional: Close button (Add this button in your HTML if not already present)
-    const closeButton = document.createElement('button');
-    closeButton.classList.add('close-button');
-    closeButton.innerHTML = '&times;'; // Close icon (×)
-    videoPlayerContainer.appendChild(closeButton);
+    const closeButton = document.querySelector('.close-button');
 
     // Function to show the video player
     function showVideoPlayer(videoFile) {
@@ -38,13 +33,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Pause the video and hide the player when the video ends
     videoPlayer.addEventListener('ended', function () {
         videoPlayerContainer.classList.remove('show');
-    });
-
-    // Optional: Close video player if user clicks outside of the video area
-    window.addEventListener('click', function (event) {
-        if (event.target === videoPlayerContainer) {
-            videoPlayer.pause();
-            videoPlayerContainer.classList.remove('show');
-        }
     });
 });
