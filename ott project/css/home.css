@@ -37,7 +37,7 @@ nav ul {
     text-align: center;
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 20px;
 }
 
 nav ul li a {
@@ -45,25 +45,23 @@ nav ul li a {
     color: var(--text-white);
     font-size: 16px;
     font-weight: 500;
-    position: relative;
-    transition: color 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 25px;
+    background: rgba(229, 9, 20, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
 }
 
-nav ul li a::after {
-    content: '';
-    display: block;
-    width: 0;
-    height: 2px;
-    background: var(--accent-color);
-    transition: width 0.3s;
-    position: absolute;
-    bottom: -5px;
-    left: 0;
+nav ul li a:hover {
+    background: rgba(229, 9, 20, 0.2);
+    border-color: var(--main-red);
+    transform: translateY(-2px);
 }
 
-nav ul li a:hover::after,
-nav ul li a.active::after {
-    width: 100%;
+nav ul li a.active {
+    background: var(--main-red);
+    color: var(--text-white);
+    border-color: var(--main-red);
 }
 
 /* Genre Button Styles */
@@ -135,11 +133,32 @@ nav ul li a.active::after {
     padding: 0 20px;
 }
 
-.hero h1 {
-    font-size: 4rem;
+.hero .brand-title {
+    font-size: 4.5rem;
     margin-bottom: 20px;
-    letter-spacing: 2px;
+    letter-spacing: 4px;
     color: var(--accent-color);
+    text-transform: uppercase;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5),
+                 -2px -2px 4px rgba(255, 255, 255, 0.1);
+    background: linear-gradient(45deg, var(--accent-color), #ffffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    padding: 10px 20px;
+}
+
+.hero .brand-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
 }
 
 .hero p {
@@ -163,6 +182,37 @@ nav ul li a.active::after {
     background-color: var(--hover-red);
     transform: translateY(-3px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.social-share {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.share-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--dark-gray);
+    color: var(--text-white);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-btn:hover {
+    transform: translateY(-3px);
+    background-color: var(--main-red);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.share-btn i {
+    font-size: 18px;
 }
 
 /* Footer Styles */
