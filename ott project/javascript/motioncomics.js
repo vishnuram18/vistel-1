@@ -1,41 +1,37 @@
+// Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', function () {
     const items = document.querySelectorAll('.item'); // Select all motion comic items
+    const videoPlayerContainer = document.getElementById('videoPlayerContainer');
     const videoPlayer = document.getElementById('videoPlayer');
     const videoSource = document.getElementById('videoSource');
-    const playPauseButton = document.getElementById('playPauseButton');
-    const videoPlayerContainer = document.getElementById('videoPlayerContainer');
+    const closeButton = document.querySelector('.close-button');
 
-    // Loop through all items and add event listeners
+    // Function to show the video player
+    function showVideoPlayer(videoFile) {
+        videoSource.src = `../videos/${videoFile}`; // Ensure the path to your video files is correct
+        videoPlayer.load();
+        videoPlayer.play();
+        videoPlayerContainer.classList.add('show'); // Slide-up animation
+    }
+
+    // Loop through all items and add click event listeners
     items.forEach(item => {
         item.addEventListener('click', function () {
-            // Get the video source for the clicked item
             const videoFile = item.getAttribute('data-video');
-            
             if (videoFile) {
-                // Set the video source and play the video
-                videoSource.src = `../videos/${videoFile}`; // Ensure the path to your video files is correct
-                videoPlayer.load();
-                videoPlayer.play();
-
-                // Show the video player container
-                videoPlayerContainer.style.display = 'flex';
-
-                // Change button text to "Pause"
-                playPauseButton.textContent = 'Pause';
-            } else {
-                console.error('No video file found!');
+                showVideoPlayer(videoFile);
             }
         });
     });
 
-    // Toggle play/pause functionality
-    playPauseButton.addEventListener('click', function () {
-        if (videoPlayer.paused) {
-            videoPlayer.play();
-            playPauseButton.textContent = 'Pause';
-        } else {
-            videoPlayer.pause();
-            playPauseButton.textContent = 'Play';
-        }
+    // Close video player when clicking the close button
+    closeButton.addEventListener('click', function () {
+        videoPlayer.pause(); // Pause the video
+        videoPlayerContainer.classList.remove('show'); // Slide-down animation
+    });
+
+    // Pause the video and hide the player when the video ends
+    videoPlayer.addEventListener('ended', function () {
+        videoPlayerContainer.classList.remove('show');
     });
 });

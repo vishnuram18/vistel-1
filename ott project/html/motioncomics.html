@@ -8,25 +8,28 @@
     <link rel="stylesheet" href="../css/motiomcomics.css">
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="motioncomics.html">MotionComics</a></li>
-            <li><a href="subscription.html">Subscription</a></li>
-            <li><a class="active" href="profile.html">Profile</a></li>
-        </ul>
-    </nav>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="motioncomics.html" class="active">Motion Comics</a></li>
+                <li><a href="subscription.html">Subscription</a></li>
+                <li><a href="profile.html">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
 
+    <!-- MotionComics Collection Section -->
     <div class="content-wrapper">
         <h2 class="section-title">MotionComics Collection</h2>
         <div class="item-list">
-            <!-- Motioncomic 1 -->
+            <!-- MotionComic Item 1 -->
             <div class="item" data-video="motioncomic1.mp4">
                 <img src="../image/haunting adeline.jpg" alt="Motioncomic 1">
-                <h3>Motioncomic Title 1</h3>
+                <h3>Haunting Adeline</h3>
                 <p>Author: H. D. Carlton</p>
             </div>
-            <!-- Motioncomic 2 -->
+            <!-- MotionComic Item 2 -->
             <div class="item" data-video="motioncomic2.mp4">
                 <img src="../image/pexels-artem-saranin-1496373.jpg" alt="Motioncomic 2">
                 <h3>The Art of Being Alone</h3>
@@ -41,9 +44,10 @@
             <source id="videoSource" src="" type="video/mp4">
             Your browser does not support the video element.
         </video>
-        <button id="playPauseButton">Pause</button>
+        <button class="close-button">&times;</button>
     </div>
 
+    <!-- JavaScript File -->
     <script src="../javascript/motioncomics.js"></script>
 </body>
 </html>
