@@ -28,36 +28,41 @@ body {
 }
 
 /* Navigation Styles */
-nav {
-    background-color: var(--netflix-dark);
-    padding: 20px 0;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
 
 nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
     display: flex;
     justify-content: center;
-    align-items: center;
     gap: 20px;
 }
 
-nav a {
-    color: var(--light-gray);
-    font-size: 18px;
+nav ul li a {
+    text-decoration: none;
+    color: var(--text-white);
+    font-size: 16px;
     font-weight: 500;
-    transition: color 0.3s ease, transform 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 25px;
+    background: rgba(229, 9, 20, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
 }
 
-nav a:hover,
-nav a.active {
-    color: var(--netflix-red);
-    font-weight: bold;
-    transform: scale(1.1);
+nav ul li a:hover {
+    background: rgba(229, 9, 20, 0.2);
+    border-color: var(--main-red);
+    transform: translateY(-2px);
 }
+
+nav ul li a.active {
+    background: var(--main-red);
+    color: var(--text-white);
+    border-color: var(--main-red);
+}
+
 
 /* Profile Page Specific Styling */
 .profile-wrapper {

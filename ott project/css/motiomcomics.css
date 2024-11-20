@@ -15,33 +15,58 @@ body {
 }
 
 /* Navigation styles */
+/* Navigation styles */
 nav {
-    background-color: #141414;
-    padding: 15px 0;
-    text-align: center;
-    border-bottom: 1px solid #333;
+    position: fixed; /* Keep navigation fixed at the top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #141414; /* Match background for seamless look */
+    z-index: 100; /* Ensure it stays above other content */
+    padding: 10px 0; /* Add some padding for better visibility */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Optional shadow for depth */
 }
 
 nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
     display: flex;
     justify-content: center;
-    align-items: center;
+    gap: 20px;
 }
 
-nav li {
-    margin: 0 20px;
+nav ul li a {
+    text-decoration: none;
+    color: var(--text-white);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 25px;
+    background: rgba(229, 9, 20, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
 }
 
-nav a {
-    color: #e5e5e5;
-    font-size: 18px;
-    transition: color 0.3s ease-in-out;
+nav ul li a:hover {
+    background: rgba(229, 9, 20, 0.2);
+    border-color: var(--main-red);
+    transform: translateY(-2px);
 }
 
-nav a:hover,
-nav a.active {
-    color: #e50914; /* Netflix red for hover and active links */
-    font-weight: bold;
+nav ul li a.active {
+    background: var(--main-red);
+    color: var(--text-white);
+    border-color: var(--main-red);
+}
+
+/* Add top padding to body to avoid overlap */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #141414; /* Dark background for a sleek OTT look */
+    color: #fff;
+    padding-top: 60px; /* Adjust this based on nav height */
 }
 
 /* Content wrapper styles */
