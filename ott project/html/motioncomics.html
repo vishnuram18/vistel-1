@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTT - MotionComics</title>
+    <title>Vistel - Motion Comics</title>
     <link rel="stylesheet" href="../css/motiomcomics.css">
 </head>
 <body>
@@ -19,26 +19,29 @@
         </nav>
     </header>
 
-    <!-- MotionComics Collection Section -->
     <div class="content-wrapper">
         <h2 class="section-title">MotionComics Collection</h2>
         <div class="item-list">
-            <!-- MotionComic Item 1 -->
-            <div class="item" data-video="motioncomic1.mp4">
-                <img src="../image/haunting adeline.jpg" alt="Motioncomic 1">
+            <div class="item" data-id="haunting-adeline" data-video="motioncomic1.mp4" data-title="Haunting Adeline" data-total="10">
+                <img src="../image/haunting adeline.jpg" alt="Haunting Adeline">
                 <h3>Haunting Adeline</h3>
                 <p>Author: H. D. Carlton</p>
+                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
+                    <div class="item-progress" id="progress-haunting-adeline" style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
+                </div>
             </div>
-            <!-- MotionComic Item 2 -->
-            <div class="item" data-video="motioncomic2.mp4">
-                <img src="../image/pexels-artem-saranin-1496373.jpg" alt="Motioncomic 2">
+            <div class="item" data-id="art-of-being-alone" data-video="motioncomic2.mp4" data-title="The Art of Being Alone" data-total="8">
+                <img src="../image/pexels-artem-saranin-1496373.jpg" alt="The Art of Being Alone">
                 <h3>The Art of Being Alone</h3>
                 <p>Author: Renuka Gavrani</p>
+                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
+                    <div class="item-progress" id="progress-art-of-being-alone" style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Video Player Container -->
+    <!-- Video Player -->
     <div id="videoPlayerContainer" class="video-player-container">
         <video id="videoPlayer" controls>
             <source id="videoSource" src="" type="video/mp4">
@@ -47,7 +50,116 @@
         <button class="close-button">&times;</button>
     </div>
 
-    <!-- JavaScript File -->
-    <script src="../javascript/motioncomics.js"></script>
+    <script type="module">
+        import { app } from "../javascript/firebase-config.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let activeContentId = null;
+        let saveTimer = null;
+
+        const videoPlayerContainer = document.getElementById('videoPlayerContainer');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoSource = document.getElementById('videoSource');
+        const closeButton = document.querySelector('.close-button');
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) {
+                await loadProgress();
+            }
+        });
+
+        async function loadProgress() {
+            if (!currentUser) return;
+            const items = document.querySelectorAll('.item');
+            for (const item of items) {
+                const contentId = item.getAttribute('data-id');
+                try {
+                    const snap = await getDoc(doc(db, 'progress', currentUser.uid, 'items', contentId));
+                    if (snap.exists()) {
+                        const p = snap.data().progressPercent || 0;
+                        const bar = document.getElementById('progress-' + contentId);
+                        if (bar) bar.style.width = p + '%';
+                    }
+                } catch (_) {}
+            }
+        }
+
+        async function saveProgress(contentId, currentTime, duration, title) {
+            if (!currentUser || !duration) return;
+            const percent = Math.round((currentTime / duration) * 100);
+            try {
+                await setDoc(doc(db, 'progress', currentUser.uid, 'items', contentId), {
+                    contentId,
+                    type: 'motioncomic',
+                    title,
+                    currentTime,
+                    progressPercent: percent,
+                    lastWatched: serverTimestamp()
+                }, { merge: true });
+
+                const bar = document.getElementById('progress-' + contentId);
+                if (bar) bar.style.width = percent + '%';
+            } catch (_) {}
+        }
+
+        document.querySelectorAll('.item').forEach(item => {
+            item.addEventListener('click', async () => {
+                const videoFile = item.getAttribute('data-video');
+                const contentId = item.getAttribute('data-id');
+                const title = item.getAttribute('data-title');
+
+                activeContentId = contentId;
+
+                // Restore saved progress
+                let startTime = 0;
+                if (currentUser) {
+                    try {
+                        const snap = await getDoc(doc(db, 'progress', currentUser.uid, 'items', contentId));
+                        if (snap.exists()) startTime = snap.data().currentTime || 0;
+                    } catch (_) {}
+                }
+
+                videoSource.src = `../videos/${videoFile}`;
+                videoPlayer.load();
+                videoPlayer.addEventListener('loadedmetadata', () => {
+                    videoPlayer.currentTime = startTime;
+                    videoPlayer.play();
+                }, { once: true });
+
+                videoPlayerContainer.classList.add('show');
+
+                // Auto-save progress every 5 seconds
+                clearInterval(saveTimer);
+                saveTimer = setInterval(() => {
+                    saveProgress(contentId, videoPlayer.currentTime, videoPlayer.duration, title);
+                }, 5000);
+            });
+        });
+
+        closeButton.addEventListener('click', () => {
+            clearInterval(saveTimer);
+            if (activeContentId) {
+                const title = document.querySelector(`[data-id="${activeContentId}"]`)?.getAttribute('data-title') || '';
+                saveProgress(activeContentId, videoPlayer.currentTime, videoPlayer.duration, title);
+            }
+            videoPlayer.pause();
+            videoPlayerContainer.classList.remove('show');
+        });
+
+        videoPlayer.addEventListener('ended', () => {
+            clearInterval(saveTimer);
+            if (activeContentId) {
+                const title = document.querySelector(`[data-id="${activeContentId}"]`)?.getAttribute('data-title') || '';
+                saveProgress(activeContentId, videoPlayer.duration, videoPlayer.duration, title);
+            }
+            videoPlayerContainer.classList.remove('show');
+        });
+    </script>
 </body>
 </html>

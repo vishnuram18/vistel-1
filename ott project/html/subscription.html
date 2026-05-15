@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTT - Subscription</title>
+    <title>Vistel - Subscription</title>
     <link rel="stylesheet" href="../css/subscription.css">
 </head>
 <body>
@@ -18,28 +18,121 @@
             </ul>
         </nav>
     </header>
+
     <div class="subscription-wrapper">
         <h2>Choose Your Plan</h2>
+        <p id="current-plan-msg" style="text-align:center;color:#00b4d8;font-size:0.95rem;margin-bottom:1rem;min-height:1.4em;"></p>
         <div class="subscription-plans">
-            <div class="subscription-plan">
+            <div class="subscription-plan" id="plan-basic">
                 <h3>Basic</h3>
-                <p>Access to basic features</p>
+                <p>Motion comics &amp; voice books</p>
                 <p class="price">Rs 99/month</p>
-                <button>Subscribe</button>
+                <ul style="text-align:left;padding-left:1.2rem;font-size:0.85rem;margin-bottom:1rem;">
+                    <li>SD streaming</li>
+                    <li>1 screen at a time</li>
+                    <li>All genres</li>
+                </ul>
+                <button data-plan="basic" data-price="99">Subscribe</button>
             </div>
-            <div class="subscription-plan">
+            <div class="subscription-plan" id="plan-standard">
                 <h3>Standard</h3>
-                <p>Access to all features</p>
+                <p>Everything in Basic, plus HD</p>
                 <p class="price">Rs 120/month</p>
-                <button>Subscribe</button>
+                <ul style="text-align:left;padding-left:1.2rem;font-size:0.85rem;margin-bottom:1rem;">
+                    <li>HD streaming</li>
+                    <li>2 screens at a time</li>
+                    <li>Download to watch offline</li>
+                </ul>
+                <button data-plan="standard" data-price="120">Subscribe</button>
             </div>
-            <div class="subscription-plan">
+            <div class="subscription-plan" id="plan-premium">
                 <h3>Premium</h3>
-                <p>Access to premium features</p>
+                <p>Everything in Standard, plus 4K</p>
                 <p class="price">Rs 300/month</p>
-                <button>Subscribe</button>
+                <ul style="text-align:left;padding-left:1.2rem;font-size:0.85rem;margin-bottom:1rem;">
+                    <li>4K + HDR streaming</li>
+                    <li>4 screens at a time</li>
+                    <li>Priority support</li>
+                </ul>
+                <button data-plan="premium" data-price="300">Subscribe</button>
             </div>
         </div>
+        <p id="status-msg" style="text-align:center;margin-top:1.5rem;min-height:1.4em;font-size:0.9rem;"></p>
     </div>
+
+    <script type="module">
+        import { app } from "../javascript/firebase-config.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+
+            if (user) {
+                const snap = await getDoc(doc(db, 'users', user.uid));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.subscription && data.subscription.plan) {
+                        const planName = data.subscription.plan.charAt(0).toUpperCase() + data.subscription.plan.slice(1);
+                        document.getElementById('current-plan-msg').textContent =
+                            `You are on the ${planName} plan. Choosing a new plan will replace it.`;
+                        // Highlight active plan
+                        const activeCard = document.getElementById('plan-' + data.subscription.plan);
+                        if (activeCard) {
+                            activeCard.style.border = '2px solid #00b4d8';
+                        }
+                    }
+                }
+            }
+        });
+
+        document.querySelectorAll('[data-plan]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!currentUser) {
+                    window.location.assign("signin.html");
+                    return;
+                }
+
+                const plan = btn.getAttribute('data-plan');
+                const statusMsg = document.getElementById('status-msg');
+
+                document.querySelectorAll('[data-plan]').forEach(b => b.disabled = true);
+                statusMsg.style.color = '#00b4d8';
+                statusMsg.textContent = 'Saving your plan...';
+
+                try {
+                    const now = new Date();
+                    const end = new Date(now);
+                    end.setMonth(end.getMonth() + 1);
+
+                    await updateDoc(doc(db, 'users', currentUser.uid), {
+                        subscription: {
+                            plan: plan,
+                            start_date: serverTimestamp(),
+                            end_date: end.toISOString()
+                        }
+                    });
+
+                    statusMsg.textContent = `You are now subscribed to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan!`;
+
+                    // Highlight selected
+                    document.querySelectorAll('.subscription-plan').forEach(c => c.style.border = '');
+                    document.getElementById('plan-' + plan).style.border = '2px solid #00b4d8';
+                    document.getElementById('current-plan-msg').textContent =
+                        `You are on the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.`;
+                } catch (error) {
+                    statusMsg.style.color = '#e50914';
+                    statusMsg.textContent = 'Error: ' + error.message;
+                } finally {
+                    document.querySelectorAll('[data-plan]').forEach(b => b.disabled = false);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
