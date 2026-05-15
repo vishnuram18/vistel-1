@@ -45,19 +45,12 @@
                     return;
                 }
 
-                document.querySelectorAll('.language-btn').forEach(b => b.disabled = true);
-                document.getElementById('status-msg').textContent = 'Saving preference...';
+                // Save in background — don't block navigation on Firestore
+                updateDoc(doc(db, 'users', user.uid), {
+                    language: selectedLanguage
+                }).catch(() => {});
 
-                try {
-                    await updateDoc(doc(db, 'users', user.uid), {
-                        language: selectedLanguage
-                    });
-                    window.location.assign("index.html");
-                } catch (error) {
-                    document.getElementById('status-msg').style.color = '#e50914';
-                    document.getElementById('status-msg').textContent = 'Error saving language: ' + error.message;
-                    document.querySelectorAll('.language-btn').forEach(b => b.disabled = false);
-                }
+                window.location.assign("index.html");
             });
         });
     </script>

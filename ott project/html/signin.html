@@ -73,27 +73,22 @@
                 const userRef = doc(db, 'users', user.uid);
                 const userSnap = await getDoc(userRef);
 
+                // Update last_login in background — don't block redirect
                 if (userSnap.exists()) {
-                    await updateDoc(userRef, { last_login: serverTimestamp() });
+                    updateDoc(userRef, { last_login: serverTimestamp() }).catch(() => {});
                 } else {
-                    // First login after account migration — create doc
                     const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
-                    await setDoc(userRef, {
+                    setDoc(userRef, {
                         email: user.email,
                         signup_date: serverTimestamp(),
                         last_login: serverTimestamp(),
                         language: null,
                         subscription: null
-                    });
+                    }).catch(() => {});
                 }
 
-                // Redirect to language selection if no language set yet, else home
-                const data = (await getDoc(userRef)).data();
-                if (!data.language) {
-                    window.location.assign("language-selection.html");
-                } else {
-                    window.location.assign("index.html");
-                }
+                // Always go to home — language-selection can be shown later if needed
+                window.location.assign("index.html");
             } catch (error) {
                 errMsg.textContent = error.message.replace('Firebase: ', '');
             } finally {
