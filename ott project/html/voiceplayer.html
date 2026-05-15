@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix-like Navigation</title>
-    <link rel="stylesheet" href="../css/videoplayer.css">
+    <title>Vistel - Voice Books</title>
+    <link rel="stylesheet" href="../css/voiceplayer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -18,20 +19,240 @@
         </nav>
     </header>
 
-    <div class="videobook-container">
-        <div class="videobook" data-video="video1.mp4">Videobook 1</div>
-        <div class="videobook" data-video="video2.mp4">Videobook 2</div>
-        <div class="videobook" data-video="video3.mp4">Videobook 3</div>
+    <div class="content-wrapper">
+        <h2 class="section-title">Voice Books</h2>
+        <div class="item-list">
+            <div class="item"
+                data-id="haunting-adeline-audio"
+                data-audio="audio/haunting-adeline.mp3"
+                data-title="Haunting Adeline"
+                data-author="H. D. Carlton"
+                data-chapters="44">
+                <img src="../image/haunting adeline.jpg" alt="Haunting Adeline">
+                <h3>Haunting Adeline</h3>
+                <p>H. D. Carlton &bull; 44 chapters</p>
+                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
+                    <div class="item-progress" id="progress-haunting-adeline-audio" style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
+                </div>
+            </div>
+            <div class="item"
+                data-id="poniyan-selvan"
+                data-audio="audio/poniyan-selvan.mp3"
+                data-title="Poniyan Selvan"
+                data-author="Kalki Krishnamurthy"
+                data-chapters="100">
+                <img src="../image/poniyan selvan.jpg" alt="Poniyan Selvan">
+                <h3>Poniyan Selvan</h3>
+                <p>Kalki Krishnamurthy &bull; 100 chapters</p>
+                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
+                    <div class="item-progress" id="progress-poniyan-selvan" style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
+                </div>
+            </div>
+            <div class="item"
+                data-id="naruto-audio"
+                data-audio="audio/naruto.mp3"
+                data-title="Naruto"
+                data-author="Masashi Kishimoto"
+                data-chapters="50">
+                <img src="../image/naruto1.jpg" alt="Naruto">
+                <h3>Naruto</h3>
+                <p>Masashi Kishimoto &bull; 50 chapters</p>
+                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
+                    <div class="item-progress" id="progress-naruto-audio" style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="videoPlayerContainer" class="video-player-container" style="display:none;">
-        <video id="videoPlayer" controls width="640" height="360">
-            <source id="videoSource" src="" type="video/mp4">
-            Your browser does not support the video element.
-        </video>
-        <button id="playPauseButton">Pause</button>
+    <!-- Audio Player -->
+    <div id="audioPlayerContainer" class="audio-player-container" style="display:none;">
+        <div class="audio-player-inner">
+            <img id="audioThumbnail" src="" alt="Cover" class="audio-thumb">
+            <div class="audio-info">
+                <h3 id="audioTitle">—</h3>
+                <p id="audioAuthor">—</p>
+                <input type="range" id="audioSeekBar" value="0" min="0" step="1" style="width:100%;margin:0.5rem 0;">
+                <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#aaa;">
+                    <span id="audioCurrentTime">0:00</span>
+                    <span id="audioDuration">0:00</span>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button id="rewindBtn" title="Rewind 10s"><i class="fas fa-backward"></i></button>
+                <button id="playPauseButton"><i class="fas fa-play"></i></button>
+                <button id="forwardBtn" title="Forward 10s"><i class="fas fa-forward"></i></button>
+            </div>
+            <button id="closeAudioPlayer" title="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <audio id="audioPlayer">
+            <source id="audioSource" src="" type="audio/mpeg">
+        </audio>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module">
+        import { app } from "../javascript/firebase-config.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let activeContentId = null;
+        let activeThumbnail = '';
+        let saveTimer = null;
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioSource = document.getElementById('audioSource');
+        const playerContainer = document.getElementById('audioPlayerContainer');
+        const playPauseBtn = document.getElementById('playPauseButton');
+        const seekBar = document.getElementById('audioSeekBar');
+        const currentTimeEl = document.getElementById('audioCurrentTime');
+        const durationEl = document.getElementById('audioDuration');
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) await loadAllProgress();
+        });
+
+        async function loadAllProgress() {
+            if (!currentUser) return;
+            for (const item of document.querySelectorAll('.item')) {
+                const contentId = item.getAttribute('data-id');
+                try {
+                    const snap = await getDoc(doc(db, 'progress', currentUser.uid, 'items', contentId));
+                    if (snap.exists()) {
+                        const p = snap.data().progressPercent || 0;
+                        const bar = document.getElementById('progress-' + contentId);
+                        if (bar) bar.style.width = p + '%';
+                    }
+                } catch (_) {}
+            }
+        }
+
+        async function saveProgress() {
+            if (!currentUser || !activeContentId || !audioPlayer.duration) return;
+            const percent = Math.round((audioPlayer.currentTime / audioPlayer.duration) * 100);
+            const itemEl = document.querySelector(`[data-id="${activeContentId}"]`);
+            const title = itemEl?.getAttribute('data-title') || '';
+            try {
+                await setDoc(doc(db, 'progress', currentUser.uid, 'items', activeContentId), {
+                    contentId: activeContentId,
+                    type: 'voicebook',
+                    title,
+                    thumbnail: activeThumbnail,
+                    currentTime: audioPlayer.currentTime,
+                    progressPercent: percent,
+                    lastWatched: serverTimestamp()
+                }, { merge: true });
+
+                const bar = document.getElementById('progress-' + activeContentId);
+                if (bar) bar.style.width = percent + '%';
+            } catch (_) {}
+        }
+
+        // Click item to play
+        document.querySelectorAll('.item').forEach(item => {
+            item.addEventListener('click', async () => {
+                const contentId = item.getAttribute('data-id');
+                const audioFile = item.getAttribute('data-audio');
+                const title = item.getAttribute('data-title');
+                const author = item.getAttribute('data-author');
+                const imgSrc = item.querySelector('img').src;
+
+                activeContentId = contentId;
+                activeThumbnail = imgSrc;
+
+                document.getElementById('audioTitle').textContent = title;
+                document.getElementById('audioAuthor').textContent = author;
+                document.getElementById('audioThumbnail').src = imgSrc;
+
+                audioSource.src = `../${audioFile}`;
+                audioPlayer.load();
+
+                let startTime = 0;
+                if (currentUser) {
+                    try {
+                        const snap = await getDoc(doc(db, 'progress', currentUser.uid, 'items', contentId));
+                        if (snap.exists()) startTime = snap.data().currentTime || 0;
+                    } catch (_) {}
+                }
+
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    audioPlayer.currentTime = startTime;
+                    audioPlayer.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    seekBar.max = Math.floor(audioPlayer.duration);
+                    durationEl.textContent = formatTime(audioPlayer.duration);
+                }, { once: true });
+
+                // Fallback if metadata already available
+                if (audioPlayer.readyState >= 1) {
+                    audioPlayer.currentTime = startTime;
+                    audioPlayer.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+
+                playerContainer.style.display = 'flex';
+
+                clearInterval(saveTimer);
+                saveTimer = setInterval(saveProgress, 5000);
+            });
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                audioPlayer.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+
+        document.getElementById('rewindBtn').addEventListener('click', () => {
+            audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 10);
+        });
+
+        document.getElementById('forwardBtn').addEventListener('click', () => {
+            audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 10);
+        });
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+            if (audioPlayer.duration) {
+                seekBar.value = Math.floor(audioPlayer.currentTime);
+            }
+        });
+
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            seekBar.max = Math.floor(audioPlayer.duration);
+            durationEl.textContent = formatTime(audioPlayer.duration);
+        });
+
+        seekBar.addEventListener('input', () => {
+            audioPlayer.currentTime = seekBar.value;
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            clearInterval(saveTimer);
+            saveProgress();
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+
+        document.getElementById('closeAudioPlayer').addEventListener('click', () => {
+            clearInterval(saveTimer);
+            saveProgress();
+            audioPlayer.pause();
+            playerContainer.style.display = 'none';
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+    </script>
 </body>
 </html>

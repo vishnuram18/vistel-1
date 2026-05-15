@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Language Selection</title>
+    <title>Vistel - Language Selection</title>
     <link rel="stylesheet" href="../css/language.css">
 </head>
-
 <body>
     <div class="language-container">
         <h1>Select Your Preferred Language</h1>
@@ -19,52 +17,49 @@
             <button class="language-btn" data-language="Kannada">Kannada</button>
             <button class="language-btn" data-language="Malayalam">Malayalam</button>
         </div>
+        <p id="status-msg" style="color:#00b4d8;text-align:center;margin-top:1rem;"></p>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { app } from "../javascript/firebase-config.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCJKSXv32xRhwfdEZPBl4h5NGKBV6PSBTo",
-            authDomain: "vistel-aa166.firebaseapp.com",
-            databaseURL: "https://vistel-aa166-default-rtdb.firebaseio.com",
-            projectId: "vistel-aa166",
-            storageBucket: "vistel-aa166.appspot.com",
-            messagingSenderId: "866833870372",
-            appId: "1:866833870372:web:968919efd2d0430672b2b1"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getDatabase(app);
+        const db = getFirestore(app);
 
-        // Handle language selection
+        // Redirect unauthenticated users
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.assign("signin.html");
+            }
+        });
+
         document.querySelectorAll('.language-btn').forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', async () => {
                 const selectedLanguage = button.getAttribute('data-language');
+                const user = auth.currentUser;
 
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        // Save selected language in the database
-                        update(ref(db, 'User/' + user.uid), {
-                            language: selectedLanguage
-                        })
-                        .then(() => {
-                            alert('Language selected: ' + selectedLanguage);
-                            window.location.assign("home.html"); // Redirect to homepage
-                        })
-                        .catch((error) => {
-                            alert('Error saving language: ' + error.message);
-                        });
-                    }
-                });
+                if (!user) {
+                    window.location.assign("signin.html");
+                    return;
+                }
+
+                document.querySelectorAll('.language-btn').forEach(b => b.disabled = true);
+                document.getElementById('status-msg').textContent = 'Saving preference...';
+
+                try {
+                    await updateDoc(doc(db, 'users', user.uid), {
+                        language: selectedLanguage
+                    });
+                    window.location.assign("index.html");
+                } catch (error) {
+                    document.getElementById('status-msg').style.color = '#e50914';
+                    document.getElementById('status-msg').textContent = 'Error saving language: ' + error.message;
+                    document.querySelectorAll('.language-btn').forEach(b => b.disabled = false);
+                }
             });
         });
     </script>
 </body>
-
 </html>

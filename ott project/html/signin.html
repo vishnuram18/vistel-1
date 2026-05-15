@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,14 +10,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <div class="login-container">
         <h1>Sign In</h1>
         <div class="form-login">
             <ul class="login-nav">
                 <li class="login-nav_item active">
-                    <a href="">Sign In</a>
+                    <a href="#">Sign In</a>
                 </li>
                 <li class="login-nav_item">
                     <a href="signup.html">Sign Up</a>
@@ -32,77 +30,93 @@
                 <input id="login-sign-up" type="checkbox" class="login__input--checkbox" />
                 Keep me Signed in
             </label>
+            <p id="error-msg" style="color:#e50914;font-size:0.85rem;min-height:1.2em;"></p>
             <button class="login-submit" type="button" id="submit">SIGN IN</button>
         </div>
-        <a href="" class="login-forgot">Forgot Password?</a>
+        <a href="#" id="forgot-link" class="login-forgot">Forgot Password?</a>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
-    
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCJKSXv32xRhwfdEZPBl4h5NGKBV6PSBTo",
-            authDomain: "vistel-aa166.firebaseapp.com",
-            databaseURL: "https://vistel-aa166-default-rtdb.firebaseio.com",
-            projectId: "vistel-aa166",
-            storageBucket: "vistel-aa166.appspot.com",
-            messagingSenderId: "866833870372",
-            appId: "1:866833870372:web:968919efd2d0430672b2b1"
-        };
-    
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
+        import { app } from "../javascript/firebase-config.js";
+        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, updateDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
         const auth = getAuth(app);
-        const db = getDatabase(app);
-    
-        document.getElementById('submit').addEventListener('click', async () => {
+        const db = getFirestore(app);
+        const btn = document.getElementById('submit');
+        const errMsg = document.getElementById('error-msg');
+
+        btn.addEventListener('click', async () => {
             const email = document.getElementById("login-input-email").value.trim();
             const password = document.getElementById("login-input-password").value;
-    
-            // Basic validation
+            const keepSignedIn = document.getElementById("login-sign-up").checked;
+
+            errMsg.textContent = '';
+
             if (!email || !password) {
-                alert('Please enter both email and password.');
+                errMsg.textContent = 'Please enter both email and password.';
                 return;
             }
-    
-            // Show loading indicator
-            document.getElementById('submit').innerText = 'Signing In...';
-            document.getElementById('submit').disabled = true;
-    
+
+            btn.textContent = 'Signing In...';
+            btn.disabled = true;
+
             try {
-                // Sign in the user
+                const persistence = keepSignedIn ? browserLocalPersistence : browserSessionPersistence;
+                await setPersistence(auth, persistence);
+
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                const lgdate = new Date().toISOString();
-    
-                // Update last login date in the database
-                await update(ref(db, "users/" + user.uid), {
-                    last_login: lgdate
-                });
-    
-                // Fetch user data from the database
-                const userSnapshot = await get(ref(db, "users/" + user.uid));
-                const userData = userSnapshot.val();
-    
-                // Redirect based on the redirectPage field in user data
-                if (userData && userData.redirectPage) {
-                    window.location.assign(userData.redirectPage);
+
+                // Update last login & ensure user doc exists
+                const userRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    await updateDoc(userRef, { last_login: serverTimestamp() });
                 } else {
-                    // Default redirection if no specific page is defined
-                    window.location.assign("defaultHomePage.html");
+                    // First login after account migration — create doc
+                    const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
+                    await setDoc(userRef, {
+                        email: user.email,
+                        signup_date: serverTimestamp(),
+                        last_login: serverTimestamp(),
+                        language: null,
+                        subscription: null
+                    });
+                }
+
+                // Redirect to language selection if no language set yet, else home
+                const data = (await getDoc(userRef)).data();
+                if (!data.language) {
+                    window.location.assign("language-selection.html");
+                } else {
+                    window.location.assign("index.html");
                 }
             } catch (error) {
-                alert('Sign In Error: ' + error.message);
+                errMsg.textContent = error.message.replace('Firebase: ', '');
             } finally {
-                // Hide loading indicator and enable button
-                document.getElementById('submit').innerText = 'SIGN IN';
-                document.getElementById('submit').disabled = false;
+                btn.textContent = 'SIGN IN';
+                btn.disabled = false;
+            }
+        });
+
+        document.getElementById('forgot-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-input-email").value.trim();
+            if (!email) {
+                errMsg.textContent = 'Enter your email above, then click Forgot Password.';
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(getAuth(app), email);
+                errMsg.style.color = '#00b4d8';
+                errMsg.textContent = 'Password reset email sent. Check your inbox.';
+            } catch (error) {
+                errMsg.style.color = '#e50914';
+                errMsg.textContent = error.message.replace('Firebase: ', '');
             }
         });
     </script>
-        
 </body>
 </html>

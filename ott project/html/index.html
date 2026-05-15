@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../javascript/share.js" defer></script>
 </head>
-
 <body>
     <header>
         <nav>
@@ -20,11 +18,12 @@
                 <li><a href="subscription.html">Subscription</a></li>
                 <li><a href="profile.html">Profile</a></li>
             </ul>
+            <div id="auth-nav" style="display:flex;align-items:center;gap:0.75rem;"></div>
         </nav>
     </header>
 
     <button id="genre-button" class="genre-button">
-        <i class="fas fa-list"></i> <!-- Font Awesome icon -->
+        <i class="fas fa-list"></i>
     </button>
 
     <div id="genre-list" class="genre-list">
@@ -43,43 +42,60 @@
         <a href="genre-fantasy.html" class="genre-item color-fantasy">Fantasy</a>
         <a href="genre-romance.html" class="genre-item color-romance">Romance</a>
     </div>
-    
 
     <section class="hero">
         <div class="hero-content">
             <h1 class="brand-title">VISTEL</h1>
             <p>Your favorite motion comics in one place.</p>
-            <a href="subscription.html" class="btn">Subscribe Now</a>
-            <a href="signin.html" class="btn">Login</a>
+            <div id="hero-actions">
+                <a href="subscription.html" class="btn">Subscribe Now</a>
+                <a href="signin.html" class="btn" id="hero-login-btn">Login</a>
+            </div>
         </div>
     </section>
 
-    <script type="module">
-        // Firebase Initialization
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCJKSXv32xRhwfdEZPBl4h5NGKBV6PSBTo",
-            authDomain: "vistel-aa166.firebaseapp.com",
-            databaseURL: "https://vistel-aa166-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "vistel-aa166",
-            storageBucket: "vistel-aa166.appspot.com",
-            messagingSenderId: "866833870372",
-            appId: "1:866833870372:web:968919efd2d0430672b2b1",
-            measurementId: "G-SR4078H6SP"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-    </script>
-
     <footer>
-        <p>&copy; 2024 OTT Platform. All rights reserved.</p>
+        <p>&copy; 2024 Vistel. All rights reserved.</p>
     </footer>
 
-    <!-- Include the script for genre button functionality -->
-    <script>
+    <script type="module">
+        import { app } from "../javascript/firebase-config.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            const authNav = document.getElementById('auth-nav');
+            const heroLoginBtn = document.getElementById('hero-login-btn');
+
+            if (user) {
+                // Hide the login hero button, show user greeting + logout
+                heroLoginBtn.style.display = 'none';
+
+                let displayName = user.email.split('@')[0];
+                try {
+                    const snap = await getDoc(doc(db, 'users', user.uid));
+                    if (snap.exists() && snap.data().displayName) {
+                        displayName = snap.data().displayName;
+                    }
+                } catch (_) {}
+
+                authNav.innerHTML = `
+                    <span style="color:#fff;font-size:0.9rem;">Hi, ${displayName}</span>
+                    <button id="logout-btn" style="background:#e50914;color:#fff;border:none;padding:0.4rem 1rem;border-radius:4px;cursor:pointer;">Sign Out</button>
+                `;
+
+                document.getElementById('logout-btn').addEventListener('click', async () => {
+                    await signOut(auth);
+                    window.location.reload();
+                });
+            } else {
+                authNav.innerHTML = `<a href="signin.html" style="color:#fff;font-size:0.9rem;">Sign In</a>`;
+            }
+        });
+
         document.getElementById('genre-button').addEventListener('click', () => {
             const genreList = document.getElementById('genre-list');
             const isVisible = genreList.style.left === '0px';
@@ -87,5 +103,4 @@
         });
     </script>
 </body>
-
 </html>

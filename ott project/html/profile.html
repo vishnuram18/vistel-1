@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTT - Profile</title>
+    <title>Vistel - Profile</title>
     <link rel="stylesheet" href="../css/profile1.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,94 +21,126 @@
             </ul>
         </nav>
     </header>
+
     <div class="profile-wrapper">
         <div class="profile-header">
             <div class="profile-image">
-                <img src="../image/Akatsuki.jpg" alt="Profile Image">
+                <img id="profile-avatar" src="../image/Akatsuki.jpg" alt="Profile Image">
             </div>
             <div class="profile-info">
-                <h2>venkat07</h2>
-                <p>demo@gmail.com</p>
-                <p>book Love</p>
-                <ul class="social-links">
-                    <li><i class="fab fa-google"></i></li>
-                    <li><i class="fab fa-apple"></i></li>
-                </ul>
+                <h2 id="profile-name">Loading...</h2>
+                <p id="profile-email"></p>
+                <p id="profile-plan" style="color:#00b4d8;font-weight:500;"></p>
+                <p id="profile-language" style="color:#aaa;font-size:0.85rem;"></p>
+                <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                    <button id="sign-out-btn" style="background:#e50914;color:#fff;border:none;padding:0.4rem 1rem;border-radius:4px;cursor:pointer;font-size:0.85rem;">Sign Out</button>
+                </div>
             </div>
         </div>
+
         <div class="content">
             <div class="progress-section">
-                <h2>Reading Progress</h2>
-                <ul class="progress-list">
-                    <li class="progress-item">
-                        <img src="../image/Pain.jpg" >
-                        <div class="progress-details">
-                            <h3>Naruto</h3>
-                            <p>Chapter 10 of 50</p>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 20%;"></div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="progress-item">
-                        <img src="../image/Jujutsu_kaisen.jpg">
-                        <div class="progress-details">
-                            <h3>Jujutsu kaisen</h3>
-                            <p>Chapter 25 of 100</p>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 25%;"></div>
-                            </div>
-                        </div>
-                    </li>
+                <h2>Watching Progress</h2>
+                <ul class="progress-list" id="watching-list">
+                    <li style="color:#aaa;list-style:none;padding:1rem 0;">No motion comics watched yet.</li>
                 </ul>
             </div>
             <div class="progress-section">
                 <h2>Listening Progress</h2>
-                <ul class="progress-list">
-                    <li class="progress-item">
-                        <img src="../image/haunting adeline.jpg" alt="Voicebook 1">
-                        <div class="progress-details">
-                            <h3>haunting adeline</h3>
-                            <p>Chapter 3 of 44</p>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 15%;"></div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="progress-item">
-                        <img src="../image/poniyan selvan.jpg" alt="Voicebook 2">
-                        <div class="progress-details">
-                            <h3>Poniyan selvan</h3>
-                            <p>Chapter 5 of 100</p>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 16%;"></div>
-                            </div>
-                        </div>
-                    </li>
+                <ul class="progress-list" id="listening-list">
+                    <li style="color:#aaa;list-style:none;padding:1rem 0;">No voice books started yet.</li>
                 </ul>
             </div>
         </div>
     </div>
-    <script>
-        document.querySelector("#upload").addEventListener("click", function () {
-            document.querySelector(".popup").style.display = "flex";
+
+    <script type="module">
+        import { app } from "../javascript/firebase-config.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.assign("signin.html");
+                return;
+            }
+
+            // Load user profile
+            const userSnap = await getDoc(doc(db, 'users', user.uid));
+            const userData = userSnap.exists() ? userSnap.data() : {};
+
+            const displayName = userData.displayName || user.email.split('@')[0];
+            document.getElementById('profile-name').textContent = displayName;
+            document.getElementById('profile-email').textContent = user.email;
+
+            if (userData.subscription && userData.subscription.plan) {
+                const plan = userData.subscription.plan;
+                document.getElementById('profile-plan').textContent =
+                    plan.charAt(0).toUpperCase() + plan.slice(1) + ' Plan';
+            } else {
+                document.getElementById('profile-plan').textContent = 'No active subscription';
+                document.getElementById('profile-plan').style.color = '#aaa';
+            }
+
+            if (userData.language) {
+                document.getElementById('profile-language').textContent = 'Language: ' + userData.language;
+            }
+
+            // Load watch / listen progress
+            try {
+                const progressSnap = await getDocs(collection(db, 'progress', user.uid, 'items'));
+                const watchingList = document.getElementById('watching-list');
+                const listeningList = document.getElementById('listening-list');
+
+                const motionComics = [];
+                const voiceBooks = [];
+
+                progressSnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.type === 'motioncomic') motionComics.push(data);
+                    else if (data.type === 'voicebook') voiceBooks.push(data);
+                });
+
+                if (motionComics.length > 0) {
+                    watchingList.innerHTML = motionComics.map(item => `
+                        <li class="progress-item">
+                            <div class="progress-details">
+                                <h3>${item.title || item.contentId}</h3>
+                                <p>${item.progressPercent || 0}% watched</p>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width:${item.progressPercent || 0}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+
+                if (voiceBooks.length > 0) {
+                    listeningList.innerHTML = voiceBooks.map(item => `
+                        <li class="progress-item">
+                            ${item.thumbnail ? `<img src="${item.thumbnail}" alt="${item.title || ''}">` : ''}
+                            <div class="progress-details">
+                                <h3>${item.title || item.contentId}</h3>
+                                <p>${item.progressPercent || 0}% listened</p>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width:${item.progressPercent || 0}%;"></div>
+                                </div>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Error loading progress:', err);
+            }
         });
-        document.querySelector(".close").addEventListener("click", function () {
-            document.querySelector(".popup").style.display = "none";
+
+        document.getElementById('sign-out-btn').addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.assign("signin.html");
         });
-        document.getElementById("inp").onchange = function () {
-            document.getElementById("imageUp").src = URL.createObjectURL(this.files[0]);
-        };
-        function upload1() {
-            let profilepic = document.getElementById("imageUp");
-            let inputfile = document.getElementById("inp");
-            let a = 1;
-            document.getElementById("i" + a).src = URL.createObjectURL(inputfile.files[0]);
-            document.getElementById("i" + a).style.display = "flex";
-            document.querySelector(".popup").style.display = "none";
-            a = a + 1;
-            document.getElementById("imageUp").src = "../image/profile.jpg";
-        }
     </script>
 </body>
 </html>
