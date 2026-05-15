@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vistel - Browse</title>
+    <link rel="stylesheet" href="../css/genre.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="motioncomics.html">Motion Comics</a></li>
+                <li><a href="subscription.html">Subscription</a></li>
+                <li><a href="profile.html">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <button id="genre-button" class="genre-button">
+        <i class="fas fa-list"></i>
+    </button>
+
+    <div id="genre-list" class="genre-list">
+        <br><br><br>
+        <a href="genre.html?type=most-popular" class="genre-item" data-type="most-popular">Most Popular</a>
+        <a href="genre.html?type=trending" class="genre-item" data-type="trending">Trending</a>
+        <a href="genre.html?type=imdb" class="genre-item" data-type="imdb">IMDB</a>
+        <a href="genre.html?type=moco-movies" class="genre-item" data-type="moco-movies">Moco Movies</a>
+        <br>
+        <span class="genre-label">Genre</span>
+        <a href="genre.html?type=action" class="genre-item" data-type="action">Action</a>
+        <a href="genre.html?type=drama" class="genre-item" data-type="drama">Drama</a>
+        <a href="genre.html?type=comedy" class="genre-item" data-type="comedy">Comedy</a>
+        <a href="genre.html?type=horror" class="genre-item" data-type="horror">Horror</a>
+        <a href="genre.html?type=sci-fi" class="genre-item" data-type="sci-fi">Sci-Fi</a>
+        <a href="genre.html?type=fantasy" class="genre-item" data-type="fantasy">Fantasy</a>
+        <a href="genre.html?type=romance" class="genre-item" data-type="romance">Romance</a>
+    </div>
+
+    <div class="content-wrapper">
+        <h2 class="page-title" id="page-title">Browse</h2>
+
+        <div class="section">
+            <h3 class="section-title">Motion Comics</h3>
+            <div class="item-list" id="mc-list">
+                <p class="loading-msg">Loading…</p>
+            </div>
+        </div>
+
+        <div class="section" id="vb-section">
+            <h3 class="section-title">Voice Books</h3>
+            <div class="item-list" id="vb-list">
+                <p class="loading-msg">Loading…</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="videoPlayerContainer" class="video-player-container">
+        <video id="videoPlayer" controls>
+            <source id="videoSource" src="" type="video/mp4">
+            Your browser does not support the video element.
+        </video>
+        <button class="close-button" id="closeVideoPlayer">&times;</button>
+    </div>
+
+    <!-- Audio Player Bar -->
+    <div id="audioPlayerContainer" class="audio-player-container" style="display:none;">
+        <div class="audio-player-inner">
+            <img id="audioThumbnail" src="" alt="Cover" class="audio-thumb">
+            <div class="audio-info">
+                <h3 id="audioTitle">—</h3>
+                <p id="audioAuthor">—</p>
+                <input type="range" id="audioSeekBar" value="0" min="0" step="1">
+                <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#aaa;">
+                    <span id="audioCurrentTime">0:00</span>
+                    <span id="audioDuration">0:00</span>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button id="rewindBtn" title="Rewind 10s"><i class="fas fa-backward"></i></button>
+                <button id="playPauseButton"><i class="fas fa-play"></i></button>
+                <button id="forwardBtn" title="Forward 10s"><i class="fas fa-forward"></i></button>
+            </div>
+            <button id="closeAudioPlayer" title="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <audio id="audioPlayer">
+            <source id="audioSource" src="" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script type="module">
+        import { app, rtdb } from "../javascript/firebase-config.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+        const GENRE_LABELS = {
+            'most-popular': 'Most Popular',
+            'trending':     'Trending Now',
+            'imdb':         'Top IMDB Picks',
+            'moco-movies':  'Moco Movies',
+            'action':       'Action',
+            'drama':        'Drama',
+            'comedy':       'Comedy',
+            'horror':       'Horror',
+            'sci-fi':       'Sci-Fi',
+            'fantasy':      'Fantasy',
+            'romance':      'Romance'
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const currentType = params.get('type') || 'most-popular';
+        const label = GENRE_LABELS[currentType] || 'Browse';
+
+        document.title = `Vistel - ${label}`;
+        document.getElementById('page-title').textContent = label;
+
+        // Highlight active genre in sidebar
+        document.querySelectorAll('.genre-item[data-type]').forEach(link => {
+            if (link.dataset.type === currentType) link.classList.add('active');
+        });
+
+        // Hide voice books section for moco-movies (motion comics only)
+        if (currentType === 'moco-movies') {
+            document.getElementById('vb-section').style.display = 'none';
+        }
+
+        function matchesFilter(item, isMotionComic) {
+            switch (currentType) {
+                case 'most-popular': return true;
+                case 'trending':     return item.trending === true;
+                case 'imdb':         return item.imdbRating != null && item.imdbRating >= 7;
+                case 'moco-movies':  return isMotionComic;
+                default:             return Array.isArray(item.genre) && item.genre.includes(currentType);
+            }
+        }
+
+        // ── Auth & progress tracking ──────────────────────────────────────────
+        const auth = getAuth(app);
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (!user) return;
+            onValue(ref(rtdb, `progress/${user.uid}/motioncomics`), (snap) => {
+                if (!snap.exists()) return;
+                snap.forEach(child => {
+                    const bar = document.getElementById('mc-progress-' + child.key);
+                    if (bar && child.val().progressPercent !== undefined)
+                        bar.style.width = child.val().progressPercent + '%';
+                });
+            });
+            onValue(ref(rtdb, `progress/${user.uid}/voicebooks`), (snap) => {
+                if (!snap.exists()) return;
+                snap.forEach(child => {
+                    const bar = document.getElementById('vb-progress-' + child.key);
+                    if (bar && child.val().progressPercent !== undefined)
+                        bar.style.width = child.val().progressPercent + '%';
+                });
+            });
+        });
+
+        // ── Content loaders ───────────────────────────────────────────────────
+        onValue(ref(rtdb, 'content/motioncomics'), (snap) => {
+            const list = document.getElementById('mc-list');
+            list.innerHTML = '';
+            const items = [];
+            if (snap.exists()) snap.forEach(c => { if (matchesFilter(c.val(), true)) items.push(c.val()); });
+            if (items.length === 0) {
+                list.innerHTML = '<p class="empty-msg">No Motion Comics in this category yet.</p>';
+            } else {
+                items.forEach(item => list.appendChild(buildMcCard(item)));
+            }
+        });
+
+        if (currentType !== 'moco-movies') {
+            onValue(ref(rtdb, 'content/voicebooks'), (snap) => {
+                const list = document.getElementById('vb-list');
+                list.innerHTML = '';
+                const items = [];
+                if (snap.exists()) snap.forEach(c => { if (matchesFilter(c.val(), false)) items.push(c.val()); });
+                if (items.length === 0) {
+                    list.innerHTML = '<p class="empty-msg">No Voice Books in this category yet.</p>';
+                } else {
+                    items.forEach(item => list.appendChild(buildVbCard(item)));
+                }
+            });
+        }
+
+        // ── Card builders ─────────────────────────────────────────────────────
+        function buildMcCard(item) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.dataset.id = item.id;
+            div.innerHTML = `
+                <div class="item-badge">&#9654; Video</div>
+                <img src="../${item.thumbnail}" alt="${item.title}">
+                <h3>${item.title}</h3>
+                <p>${item.author}</p>
+                ${item.imdbRating ? `<p class="imdb-badge">&#11088; ${item.imdbRating} IMDB</p>` : ''}
+                <div class="item-progress-bar">
+                    <div class="item-progress" id="mc-progress-${item.id}" style="width:0%;"></div>
+                </div>
+            `;
+            div.addEventListener('click', () => openVideo(item));
+            return div;
+        }
+
+        function buildVbCard(item) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.dataset.id = item.id;
+            div.innerHTML = `
+                <div class="item-badge item-badge--audio">&#127911; Audio</div>
+                <img src="../${item.thumbnail}" alt="${item.title}">
+                <h3>${item.title}</h3>
+                <p>${item.author} &bull; ${item.chapters} chapters</p>
+                ${item.imdbRating ? `<p class="imdb-badge">&#11088; ${item.imdbRating} IMDB</p>` : ''}
+                <div class="item-progress-bar">
+                    <div class="item-progress" id="vb-progress-${item.id}" style="width:0%;"></div>
+                </div>
+            `;
+            div.addEventListener('click', () => openAudio(item));
+            return div;
+        }
+
+        // ── Video player ──────────────────────────────────────────────────────
+        const videoPlayerContainer = document.getElementById('videoPlayerContainer');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoSource = document.getElementById('videoSource');
+        let activeVideoId = null, activeVideoTitle = '';
+        let videoSaveTimer = null;
+
+        async function openVideo(item) {
+            activeVideoId = item.id;
+            activeVideoTitle = item.title;
+            let startTime = 0;
+            if (currentUser) {
+                try {
+                    const snap = await get(ref(rtdb, `progress/${currentUser.uid}/motioncomics/${item.id}/currentTime`));
+                    if (snap.exists()) startTime = snap.val();
+                } catch (_) {}
+            }
+            videoSource.src = `../videos/${item.video}`;
+            videoPlayer.load();
+            videoPlayer.addEventListener('loadedmetadata', () => {
+                videoPlayer.currentTime = startTime;
+                videoPlayer.play();
+            }, { once: true });
+            videoPlayerContainer.classList.add('show');
+            clearInterval(videoSaveTimer);
+            videoSaveTimer = setInterval(saveVideoProgress, 5000);
+        }
+
+        async function saveVideoProgress() {
+            if (!currentUser || !activeVideoId || !videoPlayer.duration) return;
+            const percent = Math.round((videoPlayer.currentTime / videoPlayer.duration) * 100);
+            try {
+                await set(ref(rtdb, `progress/${currentUser.uid}/motioncomics/${activeVideoId}`), {
+                    contentId: activeVideoId,
+                    title: activeVideoTitle,
+                    currentTime: videoPlayer.currentTime,
+                    progressPercent: percent,
+                    lastWatched: Date.now()
+                });
+            } catch (_) {}
+        }
+
+        document.getElementById('closeVideoPlayer').addEventListener('click', () => {
+            clearInterval(videoSaveTimer);
+            saveVideoProgress();
+            videoPlayer.pause();
+            videoPlayerContainer.classList.remove('show');
+        });
+
+        videoPlayer.addEventListener('ended', () => {
+            clearInterval(videoSaveTimer);
+            saveVideoProgress();
+            videoPlayerContainer.classList.remove('show');
+        });
+
+        // ── Audio player ──────────────────────────────────────────────────────
+        const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioSource = document.getElementById('audioSource');
+        const playPauseBtn = document.getElementById('playPauseButton');
+        const seekBar = document.getElementById('audioSeekBar');
+        const currentTimeEl = document.getElementById('audioCurrentTime');
+        const durationEl = document.getElementById('audioDuration');
+        let activeAudioId = null, activeAudioThumbnail = '';
+        let audioSaveTimer = null;
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        async function openAudio(item) {
+            activeAudioId = item.id;
+            activeAudioThumbnail = `../${item.thumbnail}`;
+            document.getElementById('audioTitle').textContent = item.title;
+            document.getElementById('audioAuthor').textContent = item.author;
+            document.getElementById('audioThumbnail').src = activeAudioThumbnail;
+            audioSource.src = `../${item.audio}`;
+            audioPlayer.load();
+            let startTime = 0;
+            if (currentUser) {
+                try {
+                    const snap = await get(ref(rtdb, `progress/${currentUser.uid}/voicebooks/${item.id}/currentTime`));
+                    if (snap.exists()) startTime = snap.val();
+                } catch (_) {}
+            }
+            audioPlayer.addEventListener('loadedmetadata', () => {
+                audioPlayer.currentTime = startTime;
+                audioPlayer.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                seekBar.max = Math.floor(audioPlayer.duration);
+                durationEl.textContent = formatTime(audioPlayer.duration);
+            }, { once: true });
+            if (audioPlayer.readyState >= 1) {
+                audioPlayer.currentTime = startTime;
+                audioPlayer.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+            audioPlayerContainer.style.display = 'flex';
+            clearInterval(audioSaveTimer);
+            audioSaveTimer = setInterval(saveAudioProgress, 5000);
+        }
+
+        async function saveAudioProgress() {
+            if (!currentUser || !activeAudioId || !audioPlayer.duration) return;
+            const percent = Math.round((audioPlayer.currentTime / audioPlayer.duration) * 100);
+            try {
+                await set(ref(rtdb, `progress/${currentUser.uid}/voicebooks/${activeAudioId}`), {
+                    contentId: activeAudioId,
+                    title: document.getElementById('audioTitle').textContent,
+                    thumbnail: activeAudioThumbnail,
+                    currentTime: audioPlayer.currentTime,
+                    progressPercent: percent,
+                    lastWatched: Date.now()
+                });
+            } catch (_) {}
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audioPlayer.paused) { audioPlayer.play(); playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { audioPlayer.pause(); playPauseBtn.innerHTML = '<i class="fas fa-play"></i>'; }
+        });
+
+        document.getElementById('rewindBtn').addEventListener('click', () => {
+            audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 10);
+        });
+
+        document.getElementById('forwardBtn').addEventListener('click', () => {
+            audioPlayer.currentTime = Math.min(audioPlayer.duration || 0, audioPlayer.currentTime + 10);
+        });
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+            if (audioPlayer.duration) seekBar.value = Math.floor(audioPlayer.currentTime);
+        });
+
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            seekBar.max = Math.floor(audioPlayer.duration);
+            durationEl.textContent = formatTime(audioPlayer.duration);
+        });
+
+        seekBar.addEventListener('input', () => { audioPlayer.currentTime = seekBar.value; });
+
+        audioPlayer.addEventListener('ended', () => {
+            clearInterval(audioSaveTimer);
+            saveAudioProgress();
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+
+        document.getElementById('closeAudioPlayer').addEventListener('click', () => {
+            clearInterval(audioSaveTimer);
+            saveAudioProgress();
+            audioPlayer.pause();
+            audioPlayerContainer.style.display = 'none';
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        });
+
+        // ── Genre sidebar toggle ──────────────────────────────────────────────
+        document.getElementById('genre-button').addEventListener('click', () => {
+            const list = document.getElementById('genre-list');
+            list.style.left = list.style.left === '0px' ? '-280px' : '0px';
+        });
+    </script>
+</body>
+</html>

@@ -21,23 +21,8 @@
 
     <div class="content-wrapper">
         <h2 class="section-title">MotionComics Collection</h2>
-        <div class="item-list">
-            <div class="item" data-id="haunting-adeline" data-video="motioncomic1.mp4" data-title="Haunting Adeline" data-total="10">
-                <img src="../image/haunting adeline.jpg" alt="Haunting Adeline">
-                <h3>Haunting Adeline</h3>
-                <p>Author: H. D. Carlton</p>
-                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
-                    <div class="item-progress" id="progress-haunting-adeline" style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
-                </div>
-            </div>
-            <div class="item" data-id="art-of-being-alone" data-video="motioncomic2.mp4" data-title="The Art of Being Alone" data-total="8">
-                <img src="../image/pexels-artem-saranin-1496373.jpg" alt="The Art of Being Alone">
-                <h3>The Art of Being Alone</h3>
-                <p>Author: Renuka Gavrani</p>
-                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
-                    <div class="item-progress" id="progress-art-of-being-alone" style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
-                </div>
-            </div>
+        <div class="item-list" id="item-list">
+            <p id="loading-msg" style="color:#aaa;padding:1rem;">Loading content...</p>
         </div>
     </div>
 
@@ -51,113 +36,120 @@
     </div>
 
     <script type="module">
-        import { app } from "../javascript/firebase-config.js";
+        import { app, rtdb } from "../javascript/firebase-config.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
         const auth = getAuth(app);
-        const db = getFirestore(app);
-
         let currentUser = null;
         let activeContentId = null;
+        let activeTitle = '';
         let saveTimer = null;
 
         const videoPlayerContainer = document.getElementById('videoPlayerContainer');
         const videoPlayer = document.getElementById('videoPlayer');
         const videoSource = document.getElementById('videoSource');
         const closeButton = document.querySelector('.close-button');
+        const itemList = document.getElementById('item-list');
 
-        onAuthStateChanged(auth, async (user) => {
+        // Track auth state; attach progress listeners once user is known
+        onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                await loadProgress();
+                // Real-time progress bars for all rendered cards
+                onValue(ref(rtdb, `progress/${user.uid}/motioncomics`), (snap) => {
+                    if (!snap.exists()) return;
+                    snap.forEach(child => {
+                        const bar = document.getElementById('progress-' + child.key);
+                        if (bar && child.val().progressPercent !== undefined) {
+                            bar.style.width = child.val().progressPercent + '%';
+                        }
+                    });
+                });
             }
         });
 
-        async function loadProgress() {
-            if (!currentUser) return;
-            const items = document.querySelectorAll('.item');
-            for (const item of items) {
-                const contentId = item.getAttribute('data-id');
-                try {
-                    const snap = await getDoc(doc(db, 'progress', currentUser.uid, 'items', contentId));
-                    if (snap.exists()) {
-                        const p = snap.data().progressPercent || 0;
-                        const bar = document.getElementById('progress-' + contentId);
-                        if (bar) bar.style.width = p + '%';
-                    }
-                } catch (_) {}
+        // Live content catalog — updates instantly when admin adds/removes content
+        onValue(ref(rtdb, 'content/motioncomics'), (snap) => {
+            document.getElementById('loading-msg')?.remove();
+            itemList.innerHTML = '';
+
+            if (!snap.exists()) {
+                itemList.innerHTML = '<p style="color:#aaa;padding:1rem;">No content available yet.</p>';
+                return;
             }
-        }
 
-        async function saveProgress(contentId, currentTime, duration, title) {
-            if (!currentUser || !duration) return;
-            const percent = Math.round((currentTime / duration) * 100);
-            try {
-                await setDoc(doc(db, 'progress', currentUser.uid, 'items', contentId), {
-                    contentId,
-                    type: 'motioncomic',
-                    title,
-                    currentTime,
-                    progressPercent: percent,
-                    lastWatched: serverTimestamp()
-                }, { merge: true });
-
-                const bar = document.getElementById('progress-' + contentId);
-                if (bar) bar.style.width = percent + '%';
-            } catch (_) {}
-        }
-
-        document.querySelectorAll('.item').forEach(item => {
-            item.addEventListener('click', async () => {
-                const videoFile = item.getAttribute('data-video');
-                const contentId = item.getAttribute('data-id');
-                const title = item.getAttribute('data-title');
-
-                activeContentId = contentId;
-
-                // Restore saved progress
-                let startTime = 0;
-                if (currentUser) {
-                    try {
-                        const snap = await getDoc(doc(db, 'progress', currentUser.uid, 'items', contentId));
-                        if (snap.exists()) startTime = snap.data().currentTime || 0;
-                    } catch (_) {}
-                }
-
-                videoSource.src = `../videos/${videoFile}`;
-                videoPlayer.load();
-                videoPlayer.addEventListener('loadedmetadata', () => {
-                    videoPlayer.currentTime = startTime;
-                    videoPlayer.play();
-                }, { once: true });
-
-                videoPlayerContainer.classList.add('show');
-
-                // Auto-save progress every 5 seconds
-                clearInterval(saveTimer);
-                saveTimer = setInterval(() => {
-                    saveProgress(contentId, videoPlayer.currentTime, videoPlayer.duration, title);
-                }, 5000);
+            snap.forEach(child => {
+                itemList.appendChild(buildCard(child.val()));
             });
         });
 
+        function buildCard(item) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.setAttribute('data-id', item.id);
+            div.innerHTML = `
+                <img src="../${item.thumbnail}" alt="${item.title}">
+                <h3>${item.title}</h3>
+                <p>Author: ${item.author}</p>
+                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
+                    <div class="item-progress" id="progress-${item.id}"
+                         style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
+                </div>
+            `;
+            div.addEventListener('click', () => openItem(item));
+            return div;
+        }
+
+        async function openItem(item) {
+            activeContentId = item.id;
+            activeTitle = item.title;
+
+            let startTime = 0;
+            if (currentUser) {
+                try {
+                    const snap = await get(ref(rtdb, `progress/${currentUser.uid}/motioncomics/${item.id}/currentTime`));
+                    if (snap.exists()) startTime = snap.val();
+                } catch (_) {}
+            }
+
+            videoSource.src = `../videos/${item.video}`;
+            videoPlayer.load();
+            videoPlayer.addEventListener('loadedmetadata', () => {
+                videoPlayer.currentTime = startTime;
+                videoPlayer.play();
+            }, { once: true });
+
+            videoPlayerContainer.classList.add('show');
+
+            clearInterval(saveTimer);
+            saveTimer = setInterval(saveProgress, 5000);
+        }
+
+        async function saveProgress() {
+            if (!currentUser || !activeContentId || !videoPlayer.duration) return;
+            const percent = Math.round((videoPlayer.currentTime / videoPlayer.duration) * 100);
+            try {
+                await set(ref(rtdb, `progress/${currentUser.uid}/motioncomics/${activeContentId}`), {
+                    contentId: activeContentId,
+                    title: activeTitle,
+                    currentTime: videoPlayer.currentTime,
+                    progressPercent: percent,
+                    lastWatched: Date.now()
+                });
+            } catch (_) {}
+        }
+
         closeButton.addEventListener('click', () => {
             clearInterval(saveTimer);
-            if (activeContentId) {
-                const title = document.querySelector(`[data-id="${activeContentId}"]`)?.getAttribute('data-title') || '';
-                saveProgress(activeContentId, videoPlayer.currentTime, videoPlayer.duration, title);
-            }
+            saveProgress();
             videoPlayer.pause();
             videoPlayerContainer.classList.remove('show');
         });
 
         videoPlayer.addEventListener('ended', () => {
             clearInterval(saveTimer);
-            if (activeContentId) {
-                const title = document.querySelector(`[data-id="${activeContentId}"]`)?.getAttribute('data-title') || '';
-                saveProgress(activeContentId, videoPlayer.duration, videoPlayer.duration, title);
-            }
+            saveProgress();
             videoPlayerContainer.classList.remove('show');
         });
     </script>

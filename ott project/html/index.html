@@ -28,20 +28,23 @@
 
     <div id="genre-list" class="genre-list">
         <br><br><br>
-        <a href="genre-most-popular.html" class="genre-item color-popular">Most popular</a>
-        <a href="genre-trending.html" class="genre-item color-trending">Trending</a>
-        <a href="genre-IMDB.html" class="genre-item color-imdb">IMDB</a>
-        <a href="genre-Moco-movies.html" class="genre-item color-moco">Moco movies</a>
+        <a href="genre.html?type=most-popular" class="genre-item color-popular">Most Popular</a>
+        <a href="genre.html?type=trending" class="genre-item color-trending">Trending</a>
+        <a href="genre.html?type=imdb" class="genre-item color-imdb">IMDB</a>
+        <a href="genre.html?type=moco-movies" class="genre-item color-moco">Moco Movies</a>
         <br><br>
         <a class="genre-item">GENRE</a>
-        <a href="genre-action.html" class="genre-item color-action">Action</a>
-        <a href="genre-drama.html" class="genre-item color-drama">Drama</a>
-        <a href="genre-comedy.html" class="genre-item color-comedy">Comedy</a>
-        <a href="genre-horror.html" class="genre-item color-horror">Horror</a>
-        <a href="genre-sci-fi.html" class="genre-item color-sci-fi">Sci-Fi</a>
-        <a href="genre-fantasy.html" class="genre-item color-fantasy">Fantasy</a>
-        <a href="genre-romance.html" class="genre-item color-romance">Romance</a>
+        <a href="genre.html?type=action" class="genre-item color-action">Action</a>
+        <a href="genre.html?type=drama" class="genre-item color-drama">Drama</a>
+        <a href="genre.html?type=comedy" class="genre-item color-comedy">Comedy</a>
+        <a href="genre.html?type=horror" class="genre-item color-horror">Horror</a>
+        <a href="genre.html?type=sci-fi" class="genre-item color-sci-fi">Sci-Fi</a>
+        <a href="genre.html?type=fantasy" class="genre-item color-fantasy">Fantasy</a>
+        <a href="genre.html?type=romance" class="genre-item color-romance">Romance</a>
     </div>
+
+    <!-- Live announcements from RTDB -->
+    <div id="announcements-bar" style="display:none;background:#1a1a2e;border-left:3px solid #00b4d8;color:#e0e0e0;font-size:0.85rem;padding:0.6rem 1.2rem;margin:0;"></div>
 
     <section class="hero">
         <div class="hero-content">
@@ -59,9 +62,24 @@
     </footer>
 
     <script type="module">
-        import { app } from "../javascript/firebase-config.js";
+        import { app, rtdb } from "../javascript/firebase-config.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+        // Live announcements — show the latest active announcement
+        onValue(query(ref(rtdb, 'announcements'), orderByChild('timestamp'), limitToLast(1)), (snap) => {
+            const bar = document.getElementById('announcements-bar');
+            if (!snap.exists()) { bar.style.display = 'none'; return; }
+            let latest = null;
+            snap.forEach(child => { latest = child.val(); });
+            if (latest && latest.active) {
+                bar.textContent = '📢 ' + latest.message;
+                bar.style.display = 'block';
+            } else {
+                bar.style.display = 'none';
+            }
+        });
 
         const auth = getAuth(app);
         const db = getFirestore(app);
