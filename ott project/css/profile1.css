@@ -1,247 +1,247 @@
-/* Basic Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Root Variables for Modern Colors */
 :root {
-    --netflix-dark: #141414;
-    --netflix-red: #e50914;
-    --hover-red: #bf0c0c;
-    --text-white: #ffffff;
-    --light-gray: #e5e5e5;
-    --dark-gray: #222;
-    --medium-gray: #444;
-    --progress-bg: #555;
-    --accent-color: #00b4d8;
+    --bg: #0f0f0f;
+    --red: #e50914;
+    --red-glow: rgba(229,9,20,0.25);
+    --card: rgba(20,20,20,0.9);
+    --border: rgba(255,255,255,0.07);
+    --text-dim: #888;
 }
 
-/* Body Styles */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--netflix-dark);
-    color: var(--text-white);
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: #fff;
+    padding-top: 62px;
+    min-height: 100vh;
     line-height: 1.6;
-    padding: 20px;
 }
 
-/* Navigation Styles */
-
-nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+/* Nav */
+nav {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    background: rgba(15,15,15,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    padding: 12px 0;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.6);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
+
+nav ul { display: flex; justify-content: center; gap: 8px; list-style: none; }
 
 nav ul li a {
-    text-decoration: none;
-    color: var(--text-white);
-    font-size: 16px;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 25px;
-    background: rgba(229, 9, 20, 0.1);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    color: #ccc; font-size: 14px; font-weight: 500;
+    padding: 8px 18px; border-radius: 50px;
+    border: 1px solid transparent; text-decoration: none;
+    transition: all 0.25s;
 }
 
 nav ul li a:hover {
-    background: rgba(229, 9, 20, 0.2);
-    border-color: var(--main-red);
-    transform: translateY(-2px);
+    color: #fff;
+    border-color: rgba(229,9,20,0.4);
+    background: rgba(229,9,20,0.1);
 }
 
 nav ul li a.active {
-    background: var(--main-red);
-    color: var(--text-white);
-    border-color: var(--main-red);
+    background: var(--red); color: #fff;
+    border-color: var(--red);
+    box-shadow: 0 0 16px var(--red-glow);
 }
 
-
-/* Profile Page Specific Styling */
+/* Layout */
 .profile-wrapper {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: rgba(34, 34, 34, 0.8);
-    border-radius: 15px;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    max-width: 900px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem 4rem;
 }
 
-/* Profile Header */
+/* Header card */
 .profile-header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--medium-gray);
-    padding-bottom: 20px;
-    margin-bottom: 20px;
+    gap: 2rem;
+    background: var(--card);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
 }
 
-.profile-image {
-    flex-shrink: 0;
-    margin-right: 20px;
+/* Subtle red glow top-left */
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(229,9,20,0.15), transparent 70%);
+    pointer-events: none;
 }
+
+.profile-image { flex-shrink: 0; }
 
 .profile-image img {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
-    border: 3px solid var(--netflix-red);
     object-fit: cover;
-    transition: transform 0.3s ease;
+    border: 3px solid var(--red);
+    box-shadow: 0 0 0 6px rgba(229,9,20,0.15), 0 8px 24px rgba(0,0,0,0.5);
+    transition: transform 0.3s;
 }
 
-.profile-image img:hover {
-    transform: scale(1.1);
-}
+.profile-image img:hover { transform: scale(1.06); }
 
 .profile-info h2 {
-    margin-bottom: 10px;
-    color: var(--netflix-red);
-    font-size: 26px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.4rem;
 }
 
 .profile-info p {
-    margin-bottom: 5px;
-    color: var(--light-gray);
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
 }
 
-/* Social Links */
+.profile-info p strong { color: #ccc; }
+
+/* Sign out button */
+.signout-btn {
+    margin-top: 0.75rem;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid rgba(229,9,20,0.5);
+    color: #e50914;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.signout-btn:hover {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+    box-shadow: 0 4px 16px var(--red-glow);
+}
+
+/* Social links */
 .social-links {
     list-style: none;
     display: flex;
-    gap: 15px;
+    gap: 14px;
+    margin-top: 0.75rem;
 }
 
 .social-links li i {
-    font-size: 24px;
-    color: var(--netflix-red);
-    transition: color 0.3s ease;
+    font-size: 1.2rem;
+    color: #555;
+    transition: color 0.2s, transform 0.2s;
+    cursor: pointer;
 }
 
-.social-links li i:hover {
-    color: var(--hover-red);
-}
+.social-links li i:hover { color: var(--red); transform: translateY(-2px); }
 
-/* Progress Section */
+/* Progress sections */
 .progress-section {
-    margin-bottom: 30px;
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 .progress-section h2 {
-    margin-bottom: 15px;
-    color: var(--netflix-red);
-    font-size: 24px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-left: 12px;
+    border-left: 3px solid var(--red);
 }
 
-.progress-list {
-    list-style: none;
-    padding: 0;
-}
+.progress-list { list-style: none; }
 
 .progress-item {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
-    background-color: rgba(51, 51, 51, 0.8);
-    padding: 15px;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s ease;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s, transform 0.2s;
 }
 
 .progress-item:hover {
-    transform: translateY(-5px);
+    background: rgba(255,255,255,0.06);
+    transform: translateX(4px);
 }
 
 .progress-item img {
-    width: 60px;
-    height: 90px;
+    width: 52px;
+    height: 72px;
     object-fit: cover;
-    border-radius: 8px;
-    margin-right: 15px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
-.progress-details {
-    flex: 1;
-}
+.progress-details { flex: 1; min-width: 0; }
 
 .progress-details h3 {
-    margin-bottom: 5px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .progress-details p {
-    margin-bottom: 5px;
-    color: #ccc;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
 }
 
 .progress-bar {
-    background-color: var(--progress-bg);
-    border-radius: 5px;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
     overflow: hidden;
-    height: 10px;
 }
 
 .progress-bar .progress {
-    background-color: var(--netflix-red);
     height: 100%;
-    transition: width 0.4s ease;
+    background: linear-gradient(90deg, var(--red), #ff4d57);
+    border-radius: 4px;
+    transition: width 0.5s ease;
 }
 
-/* Responsive Design for Smaller Screens */
 @media (max-width: 768px) {
-    .profile-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .profile-image {
-        margin-bottom: 15px;
-    }
-
-    nav ul {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .social-links {
-        justify-content: center;
-    }
-
-    .progress-item {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .progress-item img {
-        margin-bottom: 10px;
-    }
+    .profile-header { flex-direction: column; text-align: center; padding: 1.75rem 1.5rem; }
+    .social-links { justify-content: center; }
+    nav ul { gap: 4px; }
+    nav ul li a { font-size: 12px; padding: 7px 12px; }
 }
 
 @media (max-width: 480px) {
-    .profile-wrapper {
-        padding: 20px;
-    }
-
-    .profile-info h2 {
-        font-size: 22px;
-    }
-
-    .progress-section h2 {
-        font-size: 20px;
-    }
-
-    nav a {
-        font-size: 16px;
-    }
+    .progress-item { flex-direction: column; text-align: center; }
+    .progress-item img { width: 80px; height: 60px; }
 }
