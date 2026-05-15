@@ -43,6 +43,9 @@
         <a href="genre-romance.html" class="genre-item color-romance">Romance</a>
     </div>
 
+    <!-- Live announcements from RTDB -->
+    <div id="announcements-bar" style="display:none;background:#1a1a2e;border-left:3px solid #00b4d8;color:#e0e0e0;font-size:0.85rem;padding:0.6rem 1.2rem;margin:0;"></div>
+
     <section class="hero">
         <div class="hero-content">
             <h1 class="brand-title">VISTEL</h1>
@@ -59,9 +62,24 @@
     </footer>
 
     <script type="module">
-        import { app } from "../javascript/firebase-config.js";
+        import { app, rtdb } from "../javascript/firebase-config.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+        // Live announcements — show the latest active announcement
+        onValue(query(ref(rtdb, 'announcements'), orderByChild('timestamp'), limitToLast(1)), (snap) => {
+            const bar = document.getElementById('announcements-bar');
+            if (!snap.exists()) { bar.style.display = 'none'; return; }
+            let latest = null;
+            snap.forEach(child => { latest = child.val(); });
+            if (latest && latest.active) {
+                bar.textContent = '📢 ' + latest.message;
+                bar.style.display = 'block';
+            } else {
+                bar.style.display = 'none';
+            }
+        });
 
         const auth = getAuth(app);
         const db = getFirestore(app);

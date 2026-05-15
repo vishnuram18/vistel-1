@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "content": {
+      ".read": true,
+      ".write": false
+    },
+    "progress": {
+      ".read": true,
+      ".write": true
+    },
+    "notifications": {
+      ".read": true,
+      ".write": false
+    },
+    "announcements": {
+      ".read": true,
+      ".write": false
+    }
+  }
+}
