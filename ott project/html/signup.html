@@ -72,18 +72,18 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                await setDoc(doc(db, 'users', user.uid), {
+                // Write user doc in background — don't block redirect on Firestore
+                setDoc(doc(db, 'users', user.uid), {
                     email: email,
                     signup_date: serverTimestamp(),
                     last_login: serverTimestamp(),
                     language: null,
                     subscription: null
-                });
+                }).catch(() => {});
 
                 window.location.assign("language-selection.html");
             } catch (error) {
                 errMsg.textContent = error.message.replace('Firebase: ', '');
-            } finally {
                 btn.textContent = 'SIGN UP';
                 btn.disabled = false;
             }
