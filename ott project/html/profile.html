@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vistel - Profile</title>
+    <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/profile1.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,10 +32,10 @@
             <div class="profile-info">
                 <h2 id="profile-name">Loading...</h2>
                 <p id="profile-email"></p>
-                <p id="profile-plan" style="color:#00b4d8;font-weight:500;"></p>
-                <p id="profile-language" style="color:#aaa;font-size:0.85rem;"></p>
-                <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-                    <button id="sign-out-btn" style="background:#e50914;color:#fff;border:none;padding:0.4rem 1rem;border-radius:4px;cursor:pointer;font-size:0.85rem;">Sign Out</button>
+                <p id="profile-plan" class="profile-plan"></p>
+                <p id="profile-language" class="profile-language"></p>
+                <div class="profile-actions">
+                    <button id="sign-out-btn" class="signout-btn">Sign Out</button>
                 </div>
             </div>
         </div>
@@ -43,13 +44,13 @@
             <div class="progress-section">
                 <h2>Watching Progress</h2>
                 <ul class="progress-list" id="watching-list">
-                    <li style="color:#aaa;list-style:none;padding:1rem 0;">No motion comics watched yet.</li>
+                    <li class="empty-msg">No motion comics watched yet.</li>
                 </ul>
             </div>
             <div class="progress-section">
                 <h2>Listening Progress</h2>
                 <ul class="progress-list" id="listening-list">
-                    <li style="color:#aaa;list-style:none;padding:1rem 0;">No voice books started yet.</li>
+                    <li class="empty-msg">No voice books started yet.</li>
                 </ul>
             </div>
         </div>
@@ -84,7 +85,7 @@
                     plan.charAt(0).toUpperCase() + plan.slice(1) + ' Plan';
             } else {
                 document.getElementById('profile-plan').textContent = 'No active subscription';
-                document.getElementById('profile-plan').style.color = '#aaa';
+                document.getElementById('profile-plan').classList.add('muted');
             }
 
             if (userData.language) {
@@ -120,7 +121,7 @@
                                 </div>
                             </div>
                         </li>`).join('')
-                    : '<li style="color:#aaa;list-style:none;padding:1rem 0;">No motion comics watched yet.</li>';
+                    : '<li class="empty-msg">No motion comics watched yet.</li>';
 
                 listeningList.innerHTML = voiceBooks.length > 0
                     ? voiceBooks.map(item => `
@@ -134,7 +135,7 @@
                                 </div>
                             </div>
                         </li>`).join('')
-                    : '<li style="color:#aaa;list-style:none;padding:1rem 0;">No voice books started yet.</li>';
+                    : '<li class="empty-msg">No voice books started yet.</li>';
             });
         });
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vistel - Voice Books</title>
+    <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/voiceplayer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -23,7 +24,7 @@
     <div class="content-wrapper">
         <h2 class="section-title">Voice Books</h2>
         <div class="item-list" id="item-list">
-            <p id="loading-msg" style="color:#aaa;padding:1rem;">Loading content...</p>
+            <p id="loading-msg" class="loading-msg">Loading content...</p>
         </div>
     </div>
 
@@ -34,8 +35,8 @@
             <div class="audio-info">
                 <h3 id="audioTitle">—</h3>
                 <p id="audioAuthor">—</p>
-                <input type="range" id="audioSeekBar" value="0" min="0" step="1" style="width:100%;margin:0.5rem 0;">
-                <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#aaa;">
+                <input type="range" id="audioSeekBar" value="0" min="0" step="1">
+                <div class="audio-meta-row">
                     <span id="audioCurrentTime">0:00</span>
                     <span id="audioDuration">0:00</span>
                 </div>
@@ -100,7 +101,7 @@
             itemList.innerHTML = '';
 
             if (!snap.exists()) {
-                itemList.innerHTML = '<p style="color:#aaa;padding:1rem;">No content available yet.</p>';
+                itemList.innerHTML = '<p class="empty-msg">No content available yet.</p>';
                 return;
             }
 
@@ -117,9 +118,8 @@
                 <img src="../${item.thumbnail}" alt="${item.title}">
                 <h3>${item.title}</h3>
                 <p>${item.author} &bull; ${item.chapters} chapters</p>
-                <div class="item-progress-bar" style="height:4px;background:#333;border-radius:2px;margin-top:6px;">
-                    <div class="item-progress" id="progress-${item.id}"
-                         style="height:100%;width:0%;background:#e50914;border-radius:2px;transition:width 0.3s;"></div>
+                <div class="item-progress-bar">
+                    <div class="item-progress" id="progress-${item.id}" style="width:0%;"></div>
                 </div>
             `;
             div.addEventListener('click', () => openItem(item));

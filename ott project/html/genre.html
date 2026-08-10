@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vistel - Browse</title>
+    <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/genre.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -20,18 +21,16 @@
         </nav>
     </header>
 
-    <button id="genre-button" class="genre-button">
+    <button id="genre-button" class="genre-button" aria-label="Browse genres">
         <i class="fas fa-list"></i>
     </button>
 
     <div id="genre-list" class="genre-list">
-        <br><br><br>
         <a href="genre.html?type=most-popular" class="genre-item" data-type="most-popular">Most Popular</a>
         <a href="genre.html?type=trending" class="genre-item" data-type="trending">Trending</a>
         <a href="genre.html?type=imdb" class="genre-item" data-type="imdb">IMDB</a>
         <a href="genre.html?type=moco-movies" class="genre-item" data-type="moco-movies">Moco Movies</a>
-        <br>
-        <span class="genre-label">Genre</span>
+        <span class="genre-heading">Genre</span>
         <a href="genre.html?type=action" class="genre-item" data-type="action">Action</a>
         <a href="genre.html?type=drama" class="genre-item" data-type="drama">Drama</a>
         <a href="genre.html?type=comedy" class="genre-item" data-type="comedy">Comedy</a>
@@ -76,7 +75,7 @@
                 <h3 id="audioTitle">—</h3>
                 <p id="audioAuthor">—</p>
                 <input type="range" id="audioSeekBar" value="0" min="0" step="1">
-                <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#aaa;">
+                <div class="audio-meta-row">
                     <span id="audioCurrentTime">0:00</span>
                     <span id="audioDuration">0:00</span>
                 </div>
@@ -388,8 +387,7 @@
 
         // ── Genre sidebar toggle ──────────────────────────────────────────────
         document.getElementById('genre-button').addEventListener('click', () => {
-            const list = document.getElementById('genre-list');
-            list.style.left = list.style.left === '0px' ? '-280px' : '0px';
+            document.getElementById('genre-list').classList.toggle('open');
         });
     </script>
 </body>

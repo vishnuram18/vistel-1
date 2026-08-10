@@ -1,162 +1,119 @@
-*, *::before, *::after { box-sizing: border-box; }
-body, ul, li, a { margin: 0; padding: 0; text-decoration: none; list-style: none; }
+/* Motion Comics catalog — shared chrome (nav, tokens, buttons)
+   lives in base.css. */
 
-:root {
-    --red: #e50914;
-    --red-glow: rgba(229,9,20,0.35);
-    --bg: #0f0f0f;
-    --card: #181818;
-    --card-hover: #242424;
-}
+body { padding-top: 62px; }
 
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--bg);
-    color: #fff;
-    padding-top: 62px;
-}
-
-/* Nav */
-nav {
-    position: fixed;
-    top: 0; left: 0; width: 100%;
-    background: rgba(15,15,15,0.95);
-    backdrop-filter: blur(12px);
-    z-index: 100;
-    padding: 12px 0;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.6);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-nav ul {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-}
-
-nav ul li a {
-    color: #ccc;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 8px 18px;
-    border-radius: 50px;
-    border: 1px solid transparent;
-    transition: all 0.25s;
-}
-
-nav ul li a:hover {
-    color: #fff;
-    border-color: rgba(229,9,20,0.4);
-    background: rgba(229,9,20,0.1);
-}
-
-nav ul li a.active {
-    background: var(--red);
-    color: #fff;
-    border-color: var(--red);
-    box-shadow: 0 0 16px var(--red-glow);
-}
-
-/* Content */
+/* ── Content ───────────────────────────────────────────── */
 .content-wrapper {
-    padding: 2.5rem 2rem 4rem;
+    padding: var(--space-8) var(--space-5) 4rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 .section-title {
-    font-size: 1.6rem;
+    font-size: var(--text-2xl);
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 1.75rem;
-    padding-left: 14px;
-    border-left: 4px solid var(--red);
-    letter-spacing: 0.5px;
+    margin-bottom: var(--space-6);
+    padding-left: var(--space-3);
+    border-left: 4px solid var(--red-500);
+    letter-spacing: 0.3px;
 }
 
 .item-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: var(--space-5);
 }
 
-/* Cards */
+/* ── Cards — a slightly bouncy lift on hover gives this catalog
+   a bit more personality than the flatter genre-page cards. ── */
 .item {
-    background: var(--card);
-    border-radius: 12px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     width: 210px;
     cursor: pointer;
     position: relative;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
-    border: 1px solid rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    transition: transform var(--dur-slow) cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow var(--dur-moderate) var(--ease-out),
+                background var(--dur-moderate) var(--ease-standard);
 }
 
-.item:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(229,9,20,0.3);
-    background: var(--card-hover);
+@media (hover: hover) and (pointer: fine) {
+    .item:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--red-glow);
+        background: var(--bg-elevated-2);
+    }
 }
 
-/* Play overlay on hover */
+.item:active { transform: translateY(-4px) scale(1); }
+
+/* Play overlay on hover — never appears from nothing; scales
+   in from a visible size with opacity, anchored to card center. */
 .item::after {
     content: '▶';
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -60%);
+    transform: translate(-50%, -50%) scale(0.85);
     font-size: 2.5rem;
-    color: rgba(255,255,255,0.9);
-    background: rgba(229,9,20,0.85);
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(229, 9, 20, 0.85);
     width: 60px;
     height: 60px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 60px;
     text-align: center;
     opacity: 0;
-    transition: opacity 0.25s, transform 0.25s;
+    transition: opacity var(--dur-base) var(--ease-out),
+                transform var(--dur-base) var(--ease-out);
     pointer-events: none;
     z-index: 2;
     padding-left: 4px;
 }
 
-.item:hover::after {
-    opacity: 1;
-    transform: translate(-50%, -50%);
+@media (hover: hover) and (pointer: fine) {
+    .item:hover::after { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* Image overlay */
+/* Image scrim */
 .item::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 160px;
-    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.5) 100%);
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.5) 100%);
     opacity: 0;
-    transition: opacity 0.25s;
+    transition: opacity var(--dur-base) var(--ease-standard);
     z-index: 1;
     pointer-events: none;
 }
 
-.item:hover::before { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+    .item:hover::before { opacity: 1; }
+}
 
 .item img {
     width: 100%;
     height: 160px;
     object-fit: cover;
     display: block;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) var(--ease-out);
 }
 
-.item:hover img { transform: scale(1.06); }
+@media (hover: hover) and (pointer: fine) {
+    .item:hover img { transform: scale(1.06); }
+}
 
 .item h3 {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     padding: 0.6rem 0.8rem 0.2rem;
-    color: #fff;
+    color: var(--text-primary);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -164,47 +121,57 @@ nav ul li a.active {
 }
 
 .item p {
-    font-size: 0.75rem;
-    color: #888;
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
     padding: 0 0.8rem 0.4rem;
 }
 
 .item-progress-bar {
     height: 3px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
     margin: 0.4rem 0.8rem 0.8rem;
-    border-radius: 2px;
+    border-radius: var(--radius-full);
     overflow: hidden;
 }
 
 .item-progress {
     height: 100%;
-    background: linear-gradient(90deg, var(--red), #ff4d57);
-    border-radius: 2px;
-    transition: width 0.4s ease;
+    background: linear-gradient(90deg, var(--red-500), var(--red-400));
+    border-radius: var(--radius-full);
+    transition: width var(--dur-slow) var(--ease-standard);
 }
 
-/* Video player */
+.loading-msg, .empty-msg {
+    color: var(--text-tertiary);
+    padding: 1rem;
+}
+
+/* ── Video player ──────────────────────────────────────── */
 .video-player-container {
     display: none;
     position: fixed;
     bottom: -100%;
     left: 50%;
-    transform: translateX(-50%);
-    background: rgba(8,8,8,0.97);
+    transform: translateX(-50%) scale(0.97);
+    opacity: 0;
+    background: rgba(8, 8, 10, 0.97);
     backdrop-filter: blur(16px);
     padding: 20px;
     width: 82%;
     max-width: 900px;
-    border-radius: 16px;
-    box-shadow: 0 -8px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06);
-    transition: bottom 0.5s cubic-bezier(0.16,1,0.3,1);
-    z-index: 1000;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 -8px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px var(--border-subtle);
+    transition: bottom var(--dur-slow) var(--ease-drawer),
+                opacity var(--dur-moderate) var(--ease-out),
+                transform var(--dur-moderate) var(--ease-out);
+    z-index: var(--z-modal);
 }
 
 .video-player-container.show {
     display: flex;
     bottom: 20px;
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
     justify-content: center;
 }
 
@@ -217,35 +184,36 @@ nav ul li a.active {
 .close-button {
     position: absolute;
     top: 12px; right: 14px;
-    background: rgba(229,9,20,0.15);
-    border: 1px solid rgba(229,9,20,0.3);
-    border-radius: 50%;
+    background: rgba(229, 9, 20, 0.15);
+    border: 1px solid rgba(229, 9, 20, 0.3);
+    border-radius: var(--radius-full);
     width: 34px; height: 34px;
     font-size: 18px;
-    color: #e50914;
+    color: var(--red-500);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background var(--dur-base) var(--ease-standard),
+                color var(--dur-base) var(--ease-standard),
+                transform var(--dur-fast) var(--ease-out);
     display: flex; align-items: center; justify-content: center;
 }
 
-.close-button:hover {
-    background: var(--red);
-    color: #fff;
-    transform: scale(1.1);
+@media (hover: hover) and (pointer: fine) {
+    .close-button:hover {
+        background: var(--red-500);
+        color: #fff;
+        transform: scale(1.1);
+    }
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+.close-button:active { transform: scale(0.9); }
 
+/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
     .item-list { justify-content: center; }
     .video-player-container { width: 96%; }
 }
 
 @media (max-width: 480px) {
-    nav ul { gap: 4px; }
-    nav ul li a { font-size: 12px; padding: 7px 12px; }
     .item { width: 90%; }
-    .section-title { font-size: 1.3rem; }
+    .section-title { font-size: var(--text-lg); }
 }

@@ -1,95 +1,52 @@
-*, *::before, *::after { box-sizing: border-box; }
-body, ul, li, a { margin: 0; padding: 0; text-decoration: none; list-style: none; }
+/* Voice Books catalog — cyan is the deliberate accent here
+   (audio), mirroring red on the motion-comics side. Shared
+   chrome (nav, tokens, buttons) lives in base.css. */
 
-:root {
-    --red: #e50914;
-    --red-glow: rgba(229,9,20,0.35);
-    --accent: #00b4d8;
-    --bg: #0f0f0f;
-    --card: #181818;
-}
+body { padding-top: 62px; }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: var(--bg);
-    color: #fff;
-    padding-top: 62px;
-}
-
-/* Nav */
-nav {
-    position: fixed;
-    top: 0; left: 0; width: 100%;
-    background: rgba(15,15,15,0.95);
-    backdrop-filter: blur(12px);
-    z-index: 100;
-    padding: 12px 0;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.6);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-nav ul { display: flex; justify-content: center; gap: 8px; }
-
-nav ul li { list-style: none; }
-
-nav a {
-    color: #ccc; font-size: 14px; font-weight: 500;
-    padding: 8px 18px; border-radius: 50px;
-    border: 1px solid transparent; text-decoration: none;
-    transition: all 0.25s; display: block;
-}
-
-nav a:hover {
-    color: #fff;
-    border-color: rgba(229,9,20,0.4);
-    background: rgba(229,9,20,0.1);
-}
-
-nav a.active {
-    background: var(--red); color: #fff;
-    border-color: var(--red);
-    box-shadow: 0 0 16px var(--red-glow);
-}
-
-/* Content */
+/* ── Content ───────────────────────────────────────────── */
 .content-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2.5rem 2rem 8rem;
+    padding: var(--space-8) var(--space-5) 8rem;
 }
 
 .section-title {
-    font-size: 1.6rem;
+    font-size: var(--text-2xl);
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 1.75rem;
-    padding-left: 14px;
-    border-left: 4px solid var(--accent);
-    letter-spacing: 0.5px;
+    margin-bottom: var(--space-6);
+    padding-left: var(--space-3);
+    border-left: 4px solid var(--cyan-500);
+    letter-spacing: 0.3px;
 }
 
 .item-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: var(--space-5);
 }
 
-/* Cards */
+/* ── Cards ─────────────────────────────────────────────── */
 .item {
-    background: var(--card);
-    border-radius: 12px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     width: 200px;
     cursor: pointer;
     position: relative;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
-    border: 1px solid rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    transition: transform var(--dur-slow) cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow var(--dur-moderate) var(--ease-out);
 }
 
-.item:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,180,216,0.3);
+@media (hover: hover) and (pointer: fine) {
+    .item:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--cyan-glow);
+    }
 }
+
+.item:active { transform: translateY(-4px) scale(1); }
 
 /* Headphone overlay on hover */
 .item::after {
@@ -97,22 +54,22 @@ nav a.active {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -60%);
+    transform: translate(-50%, -50%) scale(0.85);
     font-size: 2rem;
-    background: rgba(0,180,216,0.85);
+    background: rgba(0, 180, 216, 0.85);
     width: 58px; height: 58px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex; align-items: center; justify-content: center;
     line-height: 58px; text-align: center;
     opacity: 0;
-    transition: opacity 0.25s, transform 0.25s;
+    transition: opacity var(--dur-base) var(--ease-out),
+                transform var(--dur-base) var(--ease-out);
     pointer-events: none;
     z-index: 2;
 }
 
-.item:hover::after {
-    opacity: 1;
-    transform: translate(-50%, -50%);
+@media (hover: hover) and (pointer: fine) {
+    .item:hover::after { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 .item::before {
@@ -120,27 +77,32 @@ nav a.active {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 130px;
-    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.5) 100%);
-    opacity: 0; transition: opacity 0.25s;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.5) 100%);
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-standard);
     z-index: 1; pointer-events: none;
 }
 
-.item:hover::before { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+    .item:hover::before { opacity: 1; }
+}
 
 .item img {
     width: 100%;
     height: 130px;
     object-fit: cover;
     display: block;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) var(--ease-out);
 }
 
-.item:hover img { transform: scale(1.06); }
+@media (hover: hover) and (pointer: fine) {
+    .item:hover img { transform: scale(1.06); }
+}
 
 .item h3 {
-    font-size: 0.88rem;
+    font-size: var(--text-sm);
     padding: 0.55rem 0.75rem 0.2rem;
-    color: #fff;
+    color: var(--text-primary);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -148,44 +110,49 @@ nav a.active {
 }
 
 .item p {
-    font-size: 0.75rem;
-    color: #888;
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
     padding: 0 0.75rem 0.3rem;
 }
 
 .item-progress-bar {
     height: 3px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
     margin: 0.4rem 0.75rem 0.75rem;
-    border-radius: 2px;
+    border-radius: var(--radius-full);
     overflow: hidden;
 }
 
 .item-progress {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), #48cae4);
-    border-radius: 2px;
-    transition: width 0.4s ease;
+    background: linear-gradient(90deg, var(--cyan-500), var(--cyan-600));
+    border-radius: var(--radius-full);
+    transition: width var(--dur-slow) var(--ease-standard);
 }
 
-/* Sticky audio player */
+.loading-msg, .empty-msg {
+    color: var(--text-tertiary);
+    padding: 1rem;
+}
+
+/* ── Sticky audio player ───────────────────────────────── */
 .audio-player-container {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    background: rgba(12,12,12,0.97);
+    background: rgba(12, 12, 14, 0.97);
     backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid var(--border-subtle);
     padding: 0.85rem 1.5rem;
-    z-index: 1000;
+    z-index: var(--z-modal);
     align-items: center;
-    gap: 1.25rem;
-    box-shadow: 0 -8px 30px rgba(0,0,0,0.6);
+    gap: var(--space-5);
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
 }
 
 .audio-player-inner {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: var(--space-5);
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
@@ -194,15 +161,15 @@ nav a.active {
 .audio-thumb {
     width: 54px; height: 54px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    box-shadow: var(--shadow-sm);
 }
 
 .audio-info { flex: 1; min-width: 0; }
 
 .audio-info h3 {
-    font-size: 0.92rem;
+    font-size: var(--text-sm);
     margin: 0 0 0.15rem;
     white-space: nowrap;
     overflow: hidden;
@@ -210,10 +177,17 @@ nav a.active {
     font-weight: 600;
 }
 
-.audio-info p { font-size: 0.75rem; color: #777; margin: 0 0 0.3rem; }
+.audio-info p { font-size: var(--text-xs); color: var(--text-tertiary); margin: 0 0 0.3rem; }
+
+.audio-info .audio-meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+}
 
 .audio-info input[type="range"] {
-    accent-color: var(--accent);
+    accent-color: var(--cyan-500);
     cursor: pointer;
     width: 100%;
     margin: 0.3rem 0;
@@ -221,49 +195,54 @@ nav a.active {
 }
 
 .audio-controls {
-    display: flex; gap: 0.75rem;
+    display: flex; gap: var(--space-3);
     align-items: center; flex-shrink: 0;
 }
 
 .audio-controls button,
 #closeAudioPlayer {
     background: none; border: none;
-    color: #ccc; font-size: 1.15rem;
-    cursor: pointer; transition: color 0.2s;
+    color: var(--text-secondary);
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: color var(--dur-base) var(--ease-standard),
+                transform var(--dur-fast) var(--ease-out);
     padding: 0.25rem;
 }
 
-.audio-controls button:hover,
-#closeAudioPlayer:hover { color: var(--accent); }
+@media (hover: hover) and (pointer: fine) {
+    .audio-controls button:hover,
+    #closeAudioPlayer:hover { color: var(--cyan-500); }
+}
+
+.audio-controls button:active,
+#closeAudioPlayer:active { transform: scale(0.9); }
 
 #playPauseButton {
-    background: var(--accent) !important;
-    border-radius: 50%;
+    background: var(--cyan-500) !important;
+    border-radius: var(--radius-full);
     width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1rem !important;
-    color: #fff !important;
-    box-shadow: 0 0 16px rgba(0,180,216,0.4);
+    color: #04222b !important;
+    box-shadow: 0 0 16px var(--cyan-glow);
 }
 
-#playPauseButton:hover {
-    background: #0096b3 !important;
-    box-shadow: 0 0 24px rgba(0,180,216,0.6);
+@media (hover: hover) and (pointer: fine) {
+    #playPauseButton:hover {
+        background: var(--cyan-600) !important;
+        box-shadow: 0 0 24px rgba(0, 180, 216, 0.6);
+    }
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
-
+/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
     .item-list { justify-content: center; }
     .audio-player-inner { gap: 0.75rem; }
-    nav ul { gap: 4px; }
-    nav a { font-size: 12px; padding: 7px 12px; }
 }
 
 @media (max-width: 480px) {
     .item { width: 90%; }
     .audio-thumb { width: 44px; height: 44px; }
-    .section-title { font-size: 1.3rem; }
+    .section-title { font-size: var(--text-lg); }
 }

@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vistel - Subscription</title>
+    <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/subscription.css">
 </head>
 <body>
@@ -22,24 +23,25 @@
 
     <div class="subscription-wrapper">
         <h2>Choose Your Plan</h2>
-        <p id="current-plan-msg" style="text-align:center;color:#00b4d8;font-size:0.95rem;margin-bottom:1rem;min-height:1.4em;"></p>
+        <p id="current-plan-msg" class="current-plan-msg"></p>
         <div class="subscription-plans">
             <div class="subscription-plan" id="plan-basic">
                 <h3>Basic</h3>
                 <p>Motion comics &amp; voice books</p>
                 <p class="price">Rs 99/month</p>
-                <ul style="text-align:left;padding-left:1.2rem;font-size:0.85rem;margin-bottom:1rem;">
+                <ul class="plan-features">
                     <li>SD streaming</li>
                     <li>1 screen at a time</li>
                     <li>All genres</li>
                 </ul>
                 <button data-plan="basic" data-price="99">Subscribe</button>
             </div>
-            <div class="subscription-plan" id="plan-standard">
+            <div class="subscription-plan featured" id="plan-standard">
+                <span class="plan-badge">Most Popular</span>
                 <h3>Standard</h3>
                 <p>Everything in Basic, plus HD</p>
                 <p class="price">Rs 120/month</p>
-                <ul style="text-align:left;padding-left:1.2rem;font-size:0.85rem;margin-bottom:1rem;">
+                <ul class="plan-features">
                     <li>HD streaming</li>
                     <li>2 screens at a time</li>
                     <li>Download to watch offline</li>
@@ -50,7 +52,7 @@
                 <h3>Premium</h3>
                 <p>Everything in Standard, plus 4K</p>
                 <p class="price">Rs 300/month</p>
-                <ul style="text-align:left;padding-left:1.2rem;font-size:0.85rem;margin-bottom:1rem;">
+                <ul class="plan-features">
                     <li>4K + HDR streaming</li>
                     <li>4 screens at a time</li>
                     <li>Priority support</li>
@@ -58,7 +60,7 @@
                 <button data-plan="premium" data-price="300">Subscribe</button>
             </div>
         </div>
-        <p id="status-msg" style="text-align:center;margin-top:1.5rem;min-height:1.4em;font-size:0.9rem;"></p>
+        <p id="status-msg"></p>
     </div>
 
     <script type="module">
@@ -85,7 +87,7 @@
                         // Highlight active plan
                         const activeCard = document.getElementById('plan-' + data.subscription.plan);
                         if (activeCard) {
-                            activeCard.style.border = '2px solid #00b4d8';
+                            activeCard.classList.add('current-plan');
                         }
                     }
                 }
@@ -103,7 +105,8 @@
                 const statusMsg = document.getElementById('status-msg');
 
                 document.querySelectorAll('[data-plan]').forEach(b => b.disabled = true);
-                statusMsg.style.color = '#00b4d8';
+                statusMsg.classList.remove('error');
+                statusMsg.classList.add('success');
                 statusMsg.textContent = 'Saving your plan...';
 
                 try {
@@ -122,12 +125,13 @@
                     statusMsg.textContent = `You are now subscribed to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan!`;
 
                     // Highlight selected
-                    document.querySelectorAll('.subscription-plan').forEach(c => c.style.border = '');
-                    document.getElementById('plan-' + plan).style.border = '2px solid #00b4d8';
+                    document.querySelectorAll('.subscription-plan').forEach(c => c.classList.remove('current-plan'));
+                    document.getElementById('plan-' + plan).classList.add('current-plan');
                     document.getElementById('current-plan-msg').textContent =
                         `You are on the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.`;
                 } catch (error) {
-                    statusMsg.style.color = '#e50914';
+                    statusMsg.classList.remove('success');
+                    statusMsg.classList.add('error');
                     statusMsg.textContent = 'Error: ' + error.message;
                 } finally {
                     document.querySelectorAll('[data-plan]').forEach(b => b.disabled = false);

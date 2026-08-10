@@ -1,177 +1,72 @@
-:root {
-    --main-red: #e50914;
-    --hover-red: #f6121d;
-    --bg-dark: #141414;
-    --card-bg: #1c1c1c;
-    --text-white: #ffffff;
-    --text-gray: #aaa;
-    --dark-gray: #1c1c1c;
-    --light-gray: #333;
-    --accent: #00b4d8;
-}
+/* Browse/genre page — shared chrome (nav, genre sidebar toggle,
+   tokens, buttons) lives in base.css. This file covers the
+   content grid, players, and genre-specific sidebar states. */
 
-*, *::before, *::after { box-sizing: border-box; }
-body, ul, li, a { margin: 0; padding: 0; text-decoration: none; list-style: none; }
+body { padding-top: 60px; }
 
-body {
-    font-family: 'Poppins', Arial, sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-white);
-    padding-top: 60px;
-}
-
-/* Nav */
-header {
-    background: rgba(0, 0, 0, 0.92);
-    backdrop-filter: blur(10px);
-    position: fixed;
-    top: 0; left: 0; width: 100%;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-nav ul {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 14px 0;
-    margin: 0;
-}
-
-nav ul li a {
-    color: var(--text-white);
-    font-size: 15px;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 25px;
-    background: rgba(229, 9, 20, 0.1);
-    border: 2px solid transparent;
-    transition: all 0.3s;
-}
-
-nav ul li a:hover {
-    background: rgba(229, 9, 20, 0.2);
-    border-color: var(--main-red);
-    transform: translateY(-2px);
-}
-
-nav ul li a.active {
-    background: var(--main-red);
-    border-color: var(--main-red);
-}
-
-/* Genre toggle button */
-.genre-button {
-    position: fixed;
-    top: 14px; left: 16px;
-    background: var(--dark-gray);
-    border: none;
-    border-radius: 50%;
-    padding: 10px 12px;
-    color: var(--text-white);
-    font-size: 18px;
-    cursor: pointer;
-    z-index: 1001;
-    transition: transform 0.2s, background 0.2s;
-}
-
-.genre-button:hover {
-    transform: scale(1.1);
-    background: var(--main-red);
-}
-
-/* Genre sidebar */
-.genre-list {
-    position: fixed;
-    top: 0; left: -280px;
-    width: 240px; height: 100vh;
-    background: #1a1a1a;
-    overflow-y: auto;
-    transition: left 0.35s ease;
-    z-index: 999;
-    display: flex;
-    flex-direction: column;
-    padding: 24px 20px;
-}
-
-.genre-list .genre-item {
-    font-size: 15px;
-    padding: 11px 10px;
-    color: var(--text-white);
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: background 0.2s, transform 0.15s;
-    cursor: pointer;
-    display: block;
-}
-
-.genre-list .genre-item:hover {
-    background: var(--light-gray);
-    transform: translateX(4px);
-}
-
+/* This page adds an active/selected state to the shared sidebar
+   items driven by the URL's ?type= param. */
 .genre-list .genre-item.active {
-    background: var(--main-red);
+    background: var(--red-500);
+    color: #fff;
     font-weight: 600;
 }
 
-.genre-label {
-    color: #666;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    padding: 10px 10px 4px;
-    text-transform: uppercase;
-}
-
-/* Content area */
+/* ── Content area ──────────────────────────────────────── */
 .content-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1.5rem 8rem;
+    padding: var(--space-6) var(--space-5) 8rem;
 }
 
 .page-title {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
     font-weight: 700;
-    color: var(--text-white);
-    margin-bottom: 2rem;
-    border-left: 4px solid var(--main-red);
-    padding-left: 12px;
+    margin-bottom: var(--space-6);
+    border-left: 4px solid var(--red-500);
+    padding-left: var(--space-3);
 }
 
-.section { margin-bottom: 2.5rem; }
+.section { margin-bottom: var(--space-8); }
 
 .section-title {
-    font-size: 1rem;
+    font-size: var(--text-base);
     font-weight: 600;
-    color: #999;
-    margin-bottom: 1.25rem;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-4);
     text-transform: uppercase;
     letter-spacing: 1.2px;
 }
 
-/* Cards */
+/* ── Cards ─────────────────────────────────────────────── */
 .item-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.25rem;
+    gap: var(--space-5);
 }
 
 .item {
-    background: var(--card-bg);
-    border-radius: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
     overflow: hidden;
     width: 200px;
     cursor: pointer;
     position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform var(--dur-moderate) var(--ease-out),
+                box-shadow var(--dur-moderate) var(--ease-out),
+                border-color var(--dur-moderate) var(--ease-standard);
 }
 
-.item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+@media (hover: hover) and (pointer: fine) {
+    .item:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--border-strong);
+    }
 }
+
+.item:active { transform: translateY(-2px) scale(0.99); }
 
 .item img {
     width: 100%;
@@ -181,17 +76,18 @@ nav ul li a.active {
 }
 
 .item h3 {
-    font-size: 0.88rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
     padding: 0.5rem 0.75rem 0.2rem;
-    color: #fff;
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .item p {
-    font-size: 0.75rem;
-    color: var(--text-gray);
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
     padding: 0 0.75rem;
     margin-bottom: 0.2rem;
 }
@@ -204,7 +100,7 @@ nav ul li a.active {
     font-size: 0.62rem;
     font-weight: 700;
     padding: 3px 7px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -220,51 +116,58 @@ nav ul li a.active {
 
 .item-progress-bar {
     height: 3px;
-    background: #2a2a2a;
+    background: var(--bg-elevated-2);
     margin: 0.5rem 0.75rem 0.75rem;
-    border-radius: 2px;
+    border-radius: var(--radius-full);
     overflow: hidden;
 }
 
 .item-progress {
     height: 100%;
-    background: var(--main-red);
-    border-radius: 2px;
-    transition: width 0.3s;
+    background: var(--red-500);
+    border-radius: var(--radius-full);
+    transition: width var(--dur-base) var(--ease-standard);
 }
 
 .loading-msg, .empty-msg {
-    color: #666;
+    color: var(--text-tertiary);
     padding: 0.5rem 0;
-    font-size: 0.88rem;
+    font-size: var(--text-sm);
 }
 
-/* Video player modal */
+/* ── Video player modal ───────────────────────────────────
+   Rises from the bottom of the viewport — same axis it exits
+   on close, so entry/exit paths stay symmetric. */
 .video-player-container {
     display: none;
     position: fixed;
     bottom: -100%;
     left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.96);
+    transform: translateX(-50%) scale(0.97);
+    opacity: 0;
+    background: rgba(8, 8, 10, 0.97);
     padding: 20px;
     width: 82%;
     max-width: 900px;
-    border-radius: 14px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-    transition: bottom 0.45s ease;
-    z-index: 1100;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    transition: bottom var(--dur-slow) var(--ease-drawer),
+                opacity var(--dur-moderate) var(--ease-out),
+                transform var(--dur-moderate) var(--ease-out);
+    z-index: var(--z-modal);
 }
 
 .video-player-container.show {
     display: flex;
     bottom: 20px;
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
     justify-content: center;
 }
 
 #videoPlayer {
     width: 100%;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     outline: none;
 }
 
@@ -274,30 +177,36 @@ nav ul li a.active {
     background: none;
     border: none;
     font-size: 26px;
-    color: var(--main-red);
+    color: var(--red-500);
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform var(--dur-fast) var(--ease-out);
 }
 
-.close-button:hover { transform: scale(1.2); }
+@media (hover: hover) and (pointer: fine) {
+    .close-button:hover { transform: scale(1.15); }
+}
 
-/* Audio player bar */
+.close-button:active { transform: scale(0.9); }
+
+/* ── Audio player bar ──────────────────────────────────────
+   Anchored to the bottom edge; slides up along the same axis
+   it will slide back down on close. */
 .audio-player-container {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    background: rgba(16, 16, 16, 0.97);
-    backdrop-filter: blur(8px);
-    border-top: 1px solid #2a2a2a;
+    background: rgba(16, 16, 18, 0.97);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-subtle);
     padding: 0.75rem 1.5rem;
-    z-index: 1000;
+    z-index: var(--z-modal);
     align-items: center;
-    gap: 1.25rem;
+    gap: var(--space-5);
 }
 
 .audio-player-inner {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: var(--space-5);
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
@@ -306,24 +215,32 @@ nav ul li a.active {
 .audio-thumb {
     width: 52px; height: 52px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
 }
 
 .audio-info { flex: 1; min-width: 0; }
 
 .audio-info h3 {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
     margin: 0 0 0.1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.audio-info p { font-size: 0.75rem; color: #aaa; margin: 0 0 0.25rem; }
+.audio-info p { font-size: var(--text-xs); color: var(--text-tertiary); margin: 0 0 0.25rem; }
+
+.audio-info .audio-meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+}
 
 .audio-info input[type="range"] {
-    accent-color: var(--main-red);
+    accent-color: var(--red-500);
     cursor: pointer;
     width: 100%;
     margin: 0.4rem 0;
@@ -331,7 +248,7 @@ nav ul li a.active {
 
 .audio-controls {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--space-3);
     align-items: center;
     flex-shrink: 0;
 }
@@ -340,19 +257,25 @@ nav ul li a.active {
 #closeAudioPlayer {
     background: none;
     border: none;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 1.15rem;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: color var(--dur-base) var(--ease-standard),
+                transform var(--dur-fast) var(--ease-out);
     padding: 0.25rem;
 }
 
-.audio-controls button:hover,
-#closeAudioPlayer:hover { color: var(--main-red); }
+@media (hover: hover) and (pointer: fine) {
+    .audio-controls button:hover,
+    #closeAudioPlayer:hover { color: var(--red-500); }
+}
+
+.audio-controls button:active,
+#closeAudioPlayer:active { transform: scale(0.9); }
 
 #playPauseButton {
-    background: var(--main-red) !important;
-    border-radius: 50%;
+    background: var(--red-500) !important;
+    border-radius: var(--radius-full);
     width: 42px; height: 42px;
     display: flex;
     align-items: center;
@@ -360,23 +283,19 @@ nav ul li a.active {
     font-size: 1rem !important;
 }
 
-#playPauseButton:hover { background: #bf0c0c !important; }
+@media (hover: hover) and (pointer: fine) {
+    #playPauseButton:hover { background: var(--red-600) !important; }
+}
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #111; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
-
+/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
     .item-list { justify-content: center; }
     .video-player-container { width: 95%; bottom: 10px; }
     .audio-player-inner { gap: 0.75rem; }
-    nav ul { gap: 10px; }
-    .page-title { font-size: 1.5rem; }
+    .page-title { font-size: var(--text-2xl); }
 }
 
 @media (max-width: 480px) {
-    nav ul { flex-direction: column; padding: 8px 0; }
     .item { width: 90%; }
     .audio-thumb { width: 40px; height: 40px; }
 }

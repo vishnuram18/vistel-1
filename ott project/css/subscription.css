@@ -1,57 +1,9 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* Subscription/pricing page — shared chrome (nav, tokens,
+   buttons) lives in base.css. */
 
-:root {
-    --bg: #0f0f0f;
-    --red: #e50914;
-    --red-glow: rgba(229,9,20,0.3);
-    --card: rgba(24,24,24,0.9);
-    --border: rgba(255,255,255,0.07);
-}
+body { padding-top: 62px; }
 
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--bg);
-    color: #fff;
-    padding-top: 62px;
-    min-height: 100vh;
-}
-
-/* Nav */
-nav {
-    position: fixed;
-    top: 0; left: 0; width: 100%;
-    background: rgba(15,15,15,0.95);
-    backdrop-filter: blur(12px);
-    z-index: 100;
-    padding: 12px 0;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.6);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-nav ul { display: flex; justify-content: center; gap: 8px; list-style: none; }
-
-nav ul li a {
-    color: #ccc; font-size: 14px; font-weight: 500;
-    padding: 8px 18px; border-radius: 50px;
-    border: 1px solid transparent;
-    text-decoration: none;
-    transition: all 0.25s;
-}
-
-nav ul li a:hover {
-    color: #fff;
-    border-color: rgba(229,9,20,0.4);
-    background: rgba(229,9,20,0.1);
-}
-
-nav ul li a.active {
-    background: var(--red);
-    color: #fff;
-    border-color: var(--red);
-    box-shadow: 0 0 16px var(--red-glow);
-}
-
-/* Wrapper */
+/* ── Wrapper ───────────────────────────────────────────── */
 .subscription-wrapper {
     max-width: 900px;
     margin: 3rem auto;
@@ -60,56 +12,71 @@ nav ul li a.active {
 }
 
 .subscription-wrapper h2 {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
     font-weight: 800;
-    color: #fff;
-    margin-bottom: 0.5rem;
-    letter-spacing: 1px;
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.5px;
 }
 
-.subscription-wrapper > p {
-    color: #777;
-    margin-bottom: 2.5rem;
-    font-size: 0.95rem;
+.current-plan-msg {
+    text-align: center;
+    color: var(--cyan-500);
+    font-size: var(--text-base);
+    margin-bottom: var(--space-4);
+    min-height: 1.4em;
 }
 
-/* Plans grid */
+/* ── Plans grid ────────────────────────────────────────── */
 .subscription-plans {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: var(--space-5);
     align-items: stretch;
+    margin-top: var(--space-6);
 }
 
 .subscription-plan {
-    background: var(--card);
+    background: var(--bg-elevated);
     backdrop-filter: blur(12px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem 1.75rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6) var(--space-5);
     flex: 1;
     min-width: 230px;
     max-width: 270px;
     position: relative;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s, border-color 0.3s;
+    transition: transform var(--dur-slow) cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow var(--dur-moderate) var(--ease-out),
+                border-color var(--dur-moderate) var(--ease-standard);
 }
 
-.subscription-plan:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 24px 48px rgba(0,0,0,0.6);
-    border-color: rgba(229,9,20,0.4);
+@media (hover: hover) and (pointer: fine) {
+    .subscription-plan:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(229, 9, 20, 0.4);
+    }
 }
 
-/* Featured plan (Standard) */
+/* Featured plan — the recommended middle tier gets a raised
+   red ring and a badge so it reads as the default choice. */
 .subscription-plan.featured {
-    border-color: var(--red);
-    box-shadow: 0 0 0 1px var(--red), 0 16px 40px rgba(229,9,20,0.2);
-    background: rgba(229,9,20,0.06);
+    border-color: var(--red-500);
+    box-shadow: 0 0 0 1px var(--red-500), 0 16px 40px var(--red-glow);
+    background: rgba(229, 9, 20, 0.06);
 }
 
-.subscription-plan.featured:hover {
-    box-shadow: 0 0 0 1px var(--red), 0 24px 56px rgba(229,9,20,0.35);
+@media (hover: hover) and (pointer: fine) {
+    .subscription-plan.featured:hover {
+        box-shadow: 0 0 0 1px var(--red-500), 0 24px 56px rgba(229, 9, 20, 0.35);
+    }
+}
+
+/* Currently-active plan — a cyan ring distinguishes "what you
+   have" from "what's recommended" (featured, above). */
+.subscription-plan.current-plan {
+    box-shadow: 0 0 0 2px var(--cyan-500), 0 16px 40px var(--cyan-glow);
 }
 
 .plan-badge {
@@ -117,86 +84,97 @@ nav ul li a.active {
     top: -13px;
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(135deg, #e50914, #ff4d57);
+    background: linear-gradient(135deg, var(--red-500), var(--red-400));
     color: #fff;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 1px;
     padding: 4px 14px;
-    border-radius: 50px;
+    border-radius: var(--radius-full);
     text-transform: uppercase;
     white-space: nowrap;
 }
 
 .subscription-plan h3 {
-    font-size: 1.1rem;
+    font-size: var(--text-lg);
     font-weight: 700;
-    color: #fff;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .price {
     font-size: 2.4rem;
     font-weight: 900;
-    color: var(--red);
+    color: var(--red-500);
     margin-bottom: 0.2rem;
     line-height: 1;
 }
 
 .price span {
-    font-size: 1rem;
+    font-size: var(--text-base);
     font-weight: 400;
-    color: #666;
+    color: var(--text-tertiary);
 }
 
-.subscription-plan > p, .plan-features {
-    color: #999;
-    font-size: 0.85rem;
-    margin-bottom: 1.5rem;
+.subscription-plan > p:not(.price) { color: var(--text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-5); }
+
+.plan-features {
+    text-align: left;
+    padding-left: 1.2rem;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
     line-height: 1.7;
+    margin-bottom: var(--space-5);
 }
 
 .subscription-plan button {
     width: 100%;
     padding: 0.85rem;
-    font-size: 0.88rem;
+    font-size: var(--text-sm);
     font-weight: 700;
     letter-spacing: 1px;
     font-family: inherit;
-    background: linear-gradient(135deg, #e50914, #b8000c);
+    background: linear-gradient(135deg, var(--red-500), #b8000c);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.25s;
-    box-shadow: 0 4px 16px rgba(229,9,20,0.3);
+    transition: transform var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-base) var(--ease-standard);
+    box-shadow: 0 4px 16px rgba(229, 9, 20, 0.3);
 }
 
-.subscription-plan button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(229,9,20,0.5);
+@media (hover: hover) and (pointer: fine) {
+    .subscription-plan button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(229, 9, 20, 0.5);
+    }
 }
+
+.subscription-plan button:active:not(:disabled) { transform: scale(0.97); }
 
 .subscription-plan button:disabled {
-    background: #333;
-    color: #666;
+    background: var(--bg-elevated-2);
+    color: var(--text-tertiary);
     box-shadow: none;
     cursor: default;
     transform: none;
 }
 
 #status-msg {
-    margin-top: 2rem;
-    font-size: 0.9rem;
-    color: #888;
+    margin-top: var(--space-6);
+    font-size: var(--text-base);
+    color: var(--text-tertiary);
     min-height: 1.5em;
+    transition: color var(--dur-base) var(--ease-standard);
 }
 
+#status-msg.success { color: var(--cyan-500); }
+#status-msg.error { color: var(--red-500); }
+
+/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
     .subscription-plans { flex-direction: column; align-items: center; }
     .subscription-plan { max-width: 90%; width: 100%; }
-    nav ul { gap: 4px; }
-    nav ul li a { font-size: 12px; padding: 7px 12px; }
 }

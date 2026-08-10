@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vistel</title>
+    <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -18,22 +19,20 @@
                 <li><a href="subscription.html">Subscription</a></li>
                 <li><a href="profile.html">Profile</a></li>
             </ul>
-            <div id="auth-nav" style="display:flex;align-items:center;gap:0.75rem;"></div>
+            <div id="auth-nav"></div>
         </nav>
     </header>
 
-    <button id="genre-button" class="genre-button">
+    <button id="genre-button" class="genre-button" aria-label="Browse genres">
         <i class="fas fa-list"></i>
     </button>
 
     <div id="genre-list" class="genre-list">
-        <br><br><br>
         <a href="genre.html?type=most-popular" class="genre-item color-popular">Most Popular</a>
         <a href="genre.html?type=trending" class="genre-item color-trending">Trending</a>
         <a href="genre.html?type=imdb" class="genre-item color-imdb">IMDB</a>
         <a href="genre.html?type=moco-movies" class="genre-item color-moco">Moco Movies</a>
-        <br><br>
-        <a class="genre-item">GENRE</a>
+        <span class="genre-heading">Genre</span>
         <a href="genre.html?type=action" class="genre-item color-action">Action</a>
         <a href="genre.html?type=drama" class="genre-item color-drama">Drama</a>
         <a href="genre.html?type=comedy" class="genre-item color-comedy">Comedy</a>
@@ -44,15 +43,15 @@
     </div>
 
     <!-- Live announcements from RTDB -->
-    <div id="announcements-bar" style="display:none;background:#1a1a2e;border-left:3px solid #00b4d8;color:#e0e0e0;font-size:0.85rem;padding:0.6rem 1.2rem;margin:0;"></div>
+    <div id="announcements-bar" style="display:none;"></div>
 
     <section class="hero">
         <div class="hero-content">
             <h1 class="brand-title">VISTEL</h1>
             <p>Your favorite motion comics in one place.</p>
             <div id="hero-actions">
-                <a href="subscription.html" class="btn">Subscribe Now</a>
-                <a href="signin.html" class="btn" id="hero-login-btn">Login</a>
+                <a href="subscription.html" class="btn btn-primary">Subscribe Now</a>
+                <a href="signin.html" class="btn btn-ghost" id="hero-login-btn">Login</a>
             </div>
         </div>
     </section>
@@ -101,8 +100,8 @@
                 } catch (_) {}
 
                 authNav.innerHTML = `
-                    <span style="color:#fff;font-size:0.9rem;">Hi, ${displayName}</span>
-                    <button id="logout-btn" style="background:#e50914;color:#fff;border:none;padding:0.4rem 1rem;border-radius:4px;cursor:pointer;">Sign Out</button>
+                    <span class="auth-greeting">Hi, ${displayName}</span>
+                    <button id="logout-btn" class="signout-btn">Sign Out</button>
                 `;
 
                 document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -110,14 +109,12 @@
                     window.location.reload();
                 });
             } else {
-                authNav.innerHTML = `<a href="signin.html" style="color:#fff;font-size:0.9rem;">Sign In</a>`;
+                authNav.innerHTML = `<a href="signin.html">Sign In</a>`;
             }
         });
 
         document.getElementById('genre-button').addEventListener('click', () => {
-            const genreList = document.getElementById('genre-list');
-            const isVisible = genreList.style.left === '0px';
-            genreList.style.left = isVisible ? '-300px' : '0px';
+            document.getElementById('genre-list').classList.toggle('open');
         });
     </script>
 </body>
