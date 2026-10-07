@@ -1,1 +1,0 @@
-{ "name": "context-bar", "version": "0.2.0", "description": "Context-window fill bar above the prompt; /context-bar on|off applies to every session", "types": "./types/index.d.ts" }
